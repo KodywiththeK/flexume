@@ -171,6 +171,10 @@ export const useResumeStore = create<ResumeState>()(
             resumes: updatedResumes,
             currentResumeId: newResumeId,
             currentVersionId: newVersionId,
+            currentResume: updatedResumes.find((r) => r.id === newResumeId),
+            currentVersion: updatedResumes
+              .find((r) => r.id === newResumeId)
+              ?.versions.find((v) => v.versionId === newVersionId),
             isEditing: false,
             draftVersion: null,
           };
@@ -208,7 +212,14 @@ export const useResumeStore = create<ResumeState>()(
 
           return {
             resumes: updatedResumes,
+            currentResumeId: state.currentResumeId,
+            currentResume: updatedResumes.find(
+              (r) => r.id === state.currentResumeId
+            ),
             currentVersionId: newVersionId,
+            currentVersion: updatedResumes
+              .find((r) => r.id === state.currentResumeId)
+              ?.versions.find((v) => v.versionId === newVersionId),
             isEditing: false,
             draftVersion: null,
           };
@@ -243,8 +254,8 @@ export const useResumeStore = create<ResumeState>()(
 
         set({
           currentResumeId: resumeId,
-          currentVersionId: versionId,
           currentResume: resume,
+          currentVersionId: versionId,
           currentVersion:
             resume.versions.find((v) => v.versionId === versionId) || null,
           isEditing: false,
@@ -343,6 +354,13 @@ export const useResumeStore = create<ResumeState>()(
           return {
             resumes: updatedResumes,
             currentVersionId: newCurrentVersionId,
+            currentResumeId: state.currentResumeId,
+            currentResume: updatedResumes.find(
+              (r) => r.id === state.currentResumeId
+            ),
+            currentVersion: updatedResumes
+              .find((r) => r.id === state.currentResumeId)
+              ?.versions.find((v) => v.versionId === newCurrentVersionId),
             isEditing: false,
             draftVersion: null,
           };
@@ -406,6 +424,9 @@ export const useResumeStore = create<ResumeState>()(
             resumes: updatedResumes,
             isEditing: false,
             draftVersion: null,
+            currentResumeId: currentResumeId,
+            currentVersionId: currentVersionId,
+            currentResume: updatedResumes.find((r) => r.id === currentResumeId),
             currentVersion: updatedResumes
               .find((r) => r.id === currentResumeId)
               ?.versions.find((v) => v.versionId === currentVersionId),

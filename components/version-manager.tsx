@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useResumeStore } from "@/store/resume-store"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dispatch, SetStateAction, useState } from "react";
+import { useResumeStore } from "@/store/resume-store";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -12,23 +19,34 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Copy, Edit, Trash2 } from "lucide-react"
-import { formatDate } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Copy, Edit, Trash2 } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
-export default function VersionManager() {
-  const { currentResume, currentVersionId, selectVersion, createVersion, deleteVersion } = useResumeStore()
-  const [newVersionName, setNewVersionName] = useState("")
-  const [newVersionMemo, setNewVersionMemo] = useState("")
-  const [newVersionTags, setNewVersionTags] = useState("")
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+type Props = {
+  setActiveTab: Dispatch<SetStateAction<string>>;
+};
+
+export default function VersionManager({ setActiveTab }: Props) {
+  const {
+    currentResume,
+    currentVersionId,
+    selectVersion,
+    createVersion,
+    deleteVersion,
+    resumes,
+  } = useResumeStore();
+  const [newVersionName, setNewVersionName] = useState("");
+  const [newVersionMemo, setNewVersionMemo] = useState("");
+  const [newVersionTags, setNewVersionTags] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   if (!currentResume) {
-    return <div className="text-center py-10">No resume selected</div>
+    return <div className="text-center py-10">No resume selected</div>;
   }
 
   const handleCreateVersion = () => {
@@ -36,12 +54,12 @@ export default function VersionManager() {
       name: newVersionName,
       memo: newVersionMemo,
       tags: newVersionTags.split(",").map((tag) => tag.trim()),
-    })
-    setNewVersionName("")
-    setNewVersionMemo("")
-    setNewVersionTags("")
-    setIsDialogOpen(false)
-  }
+    });
+    setNewVersionName("");
+    setNewVersionMemo("");
+    setNewVersionTags("");
+    setIsDialogOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -54,7 +72,9 @@ export default function VersionManager() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>새 이력서 버전 생성</DialogTitle>
-              <DialogDescription>현재 이력서를 복사하여 새 버전을 만듭니다.</DialogDescription>
+              <DialogDescription>
+                현재 이력서를 복사하여 새 버전을 만듭니다.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
@@ -99,11 +119,17 @@ export default function VersionManager() {
         {currentResume.versions.map((version) => (
           <Card
             key={version.versionId}
-            className={`${version.versionId === currentVersionId ? "border-primary" : "border-border"}`}
+            className={`${
+              version.versionId === currentVersionId
+                ? "border-primary"
+                : "border-border"
+            }`}
           >
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">{version.name}</CardTitle>
-              <CardDescription>마지막 수정: {formatDate(version.lastEditedAt)}</CardDescription>
+              <CardDescription>
+                마지막 수정: {formatDate(version.lastEditedAt)}
+              </CardDescription>
             </CardHeader>
             <CardContent className="pb-2">
               {version.memo && <p className="text-sm mb-2">{version.memo}</p>}
@@ -136,7 +162,14 @@ export default function VersionManager() {
                   <Copy size={16} className="mr-1" />
                   복사
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => selectVersion(version.versionId)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    selectVersion(version.versionId);
+                    setActiveTab("edit");
+                  }}
+                >
                   <Edit size={16} className="mr-1" />
                   편집
                 </Button>
@@ -146,6 +179,5 @@ export default function VersionManager() {
         ))}
       </div>
     </div>
-  )
+  );
 }
-

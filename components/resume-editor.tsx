@@ -383,7 +383,7 @@ export default function ResumeEditor() {
               <TemplateSelector />
             </TabsContent>
             <TabsContent value="versions" className="mt-6">
-              <VersionManager />
+              <VersionManager setActiveTab={setActiveTab} />
             </TabsContent>
           </Tabs>
         ) : (
