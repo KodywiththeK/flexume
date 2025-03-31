@@ -20,13 +20,15 @@ export default function ResumeEditorHeader({
   // store에서 필요한 데이터 직접 사용
   const {
     resumes,
-    currentResume,
-    currentVersion,
+    getCurrentResume,
+    getCurrentVersion,
     isEditing,
     startEditing,
     cancelEditing,
     saveChanges,
   } = useResumeStore();
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
   const isTabEdit = useSearchParams().get("tab") === "edit";
   return (
     <header className="flex items-center justify-between">

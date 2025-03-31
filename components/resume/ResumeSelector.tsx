@@ -14,7 +14,9 @@ interface ResumeSelectorProps {
 }
 
 export default function ResumeSelector({ disabled }: ResumeSelectorProps) {
-  const { resumes, currentResume, selectResume, isEditing } = useResumeStore();
+  const { resumes, getCurrentResume, selectResume, isEditing } =
+    useResumeStore();
+  const currentResume = getCurrentResume();
 
   const handleSelectResume = (resumeId: string) => {
     if (!resumeId) return;

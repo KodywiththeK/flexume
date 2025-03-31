@@ -19,8 +19,8 @@ interface ResumeState {
   isEditing: boolean;
 
   // Getters
-  currentResume: Resume | null;
-  currentVersion: ResumeVersion | null;
+  getCurrentResume: () => Resume | null;
+  getCurrentVersion: () => ResumeVersion | null;
 
   // Actions
   createResume: (
@@ -84,7 +84,7 @@ const deepCopy = <T>(obj: T): T => {
   return JSON.parse(JSON.stringify(obj));
 };
 
-// Create the store with persistence
+// Create the store with persistence using localStorage
 export const useResumeStore = create<ResumeState>()(
   persist(
     (set, get) => ({
@@ -95,27 +95,14 @@ export const useResumeStore = create<ResumeState>()(
       isEditing: false,
 
       // Getters
-      get currentResume() {
+      getCurrentResume: () => {
         const { resumes, currentResumeId } = get();
-        if (!currentResumeId || !resumes || resumes.length === 0) return null;
-        const resume = resumes.find((r) => r.id === currentResumeId);
-        return resume || null;
+        return resumes.find((r) => r.id === currentResumeId) || null;
       },
-
-      get currentVersion() {
-        const { currentResume, currentVersionId, draftVersion, isEditing } =
-          get();
-
-        // 편집 중이고 임시 버전이 있으면 임시 버전 반환
-        if (isEditing && draftVersion) {
-          return draftVersion;
-        }
-
+      getCurrentVersion: () => {
+        const { getCurrentResume, currentVersionId } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return null;
-        if (!currentVersionId && currentResume.versions.length > 0) {
-          // 선택된 버전이 없으면 첫 번째 버전 반환
-          return currentResume.versions[0];
-        }
         return (
           currentResume.versions.find(
             (v) => v.versionId === currentVersionId
@@ -152,40 +139,25 @@ export const useResumeStore = create<ResumeState>()(
         };
 
         set((state) => {
-          // 새 이력서 추가
           const updatedResumes = [...state.resumes, newResume];
-
-          // 디버깅 로그
-          console.log(
-            "Creating resume:",
-            newResumeId,
-            "with version:",
-            newVersionId
-          );
-          console.log(
-            "Updated resumes:",
-            updatedResumes.map((r) => r.id)
-          );
 
           return {
             resumes: updatedResumes,
             currentResumeId: newResumeId,
             currentVersionId: newVersionId,
-            currentResume: updatedResumes.find((r) => r.id === newResumeId),
-            currentVersion: updatedResumes
-              .find((r) => r.id === newResumeId)
-              ?.versions.find((v) => v.versionId === newVersionId),
             isEditing: false,
             draftVersion: null,
           };
         });
 
-        // 생성된 이력서 ID 반환
         return newResumeId;
       },
 
       createVersion: (data) => {
-        const { currentResume, currentVersion } = get();
+        const { getCurrentResume, getCurrentVersion } = get();
+        const currentResume = getCurrentResume();
+        const currentVersion = getCurrentVersion();
+
         if (!currentResume || !currentVersion) return;
 
         const newVersionId = crypto.randomUUID();
@@ -194,7 +166,7 @@ export const useResumeStore = create<ResumeState>()(
           name: data.name,
           memo: data.memo,
           tags: data.tags,
-          blocks: deepCopy(currentVersion.blocks), // Deep copy blocks
+          blocks: deepCopy(currentVersion.blocks),
           lastEditedAt: new Date().toISOString(),
         };
 
@@ -212,14 +184,7 @@ export const useResumeStore = create<ResumeState>()(
 
           return {
             resumes: updatedResumes,
-            currentResumeId: state.currentResumeId,
-            currentResume: updatedResumes.find(
-              (r) => r.id === state.currentResumeId
-            ),
             currentVersionId: newVersionId,
-            currentVersion: updatedResumes
-              .find((r) => r.id === state.currentResumeId)
-              ?.versions.find((v) => v.versionId === newVersionId),
             isEditing: false,
             draftVersion: null,
           };
@@ -227,7 +192,6 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       selectResume: (resumeId) => {
-        // 이력서 ID가 비어있는 경우 처리
         if (!resumeId) {
           console.warn("Attempted to select resume with empty ID");
           return;
@@ -243,21 +207,9 @@ export const useResumeStore = create<ResumeState>()(
         const versionId =
           resume.versions.length > 0 ? resume.versions[0].versionId : null;
 
-        // 디버깅 로그
-        console.log(
-          `Selecting resume: ${resumeId}, with version: ${versionId}`
-        );
-        console.log(
-          "Available resumes:",
-          resumes.map((r) => ({ id: r.id, title: r.title }))
-        );
-
         set({
           currentResumeId: resumeId,
-          currentResume: resume,
           currentVersionId: versionId,
-          currentVersion:
-            resume.versions.find((v) => v.versionId === versionId) || null,
           isEditing: false,
           draftVersion: null,
         });
@@ -269,7 +221,8 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        const { currentResume } = get();
+        const { getCurrentResume } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) {
           console.warn("Cannot select version: no resume is selected");
           return;
@@ -287,9 +240,6 @@ export const useResumeStore = create<ResumeState>()(
 
         set({
           currentVersionId: versionId,
-          currentVersion:
-            currentResume.versions.find((v) => v.versionId === versionId) ||
-            null,
           isEditing: false,
           draftVersion: null,
         });
@@ -298,8 +248,6 @@ export const useResumeStore = create<ResumeState>()(
       deleteResume: (resumeId) => {
         set((state) => {
           const updatedResumes = state.resumes.filter((r) => r.id !== resumeId);
-
-          // If we're deleting the current resume, select another one if available
           let newCurrentResumeId = state.currentResumeId;
           let newCurrentVersionId = state.currentVersionId;
 
@@ -326,14 +274,12 @@ export const useResumeStore = create<ResumeState>()(
           );
           if (!currentResume) return state;
 
-          // Don't delete if it's the only version
           if (currentResume.versions.length <= 1) return state;
 
           const updatedVersions = currentResume.versions.filter(
             (v) => v.versionId !== versionId
           );
 
-          // Update the current resume with the filtered versions
           const updatedResumes = state.resumes.map((resume) => {
             if (resume.id === state.currentResumeId) {
               return {
@@ -345,7 +291,6 @@ export const useResumeStore = create<ResumeState>()(
             return resume;
           });
 
-          // If we're deleting the current version, select another one
           let newCurrentVersionId = state.currentVersionId;
           if (versionId === state.currentVersionId) {
             newCurrentVersionId = updatedVersions[0]?.versionId || null;
@@ -354,31 +299,20 @@ export const useResumeStore = create<ResumeState>()(
           return {
             resumes: updatedResumes,
             currentVersionId: newCurrentVersionId,
-            currentResumeId: state.currentResumeId,
-            currentResume: updatedResumes.find(
-              (r) => r.id === state.currentResumeId
-            ),
-            currentVersion: updatedResumes
-              .find((r) => r.id === state.currentResumeId)
-              ?.versions.find((v) => v.versionId === newCurrentVersionId),
             isEditing: false,
             draftVersion: null,
           };
         });
       },
 
-      // 편집 시작 - 현재 버전의 복사본을 만들어 임시 버전으로 설정
       startEditing: () => {
-        const { currentResume, currentVersionId } = get();
+        const { getCurrentResume, getCurrentVersion } = get();
+        const currentResume = getCurrentResume();
+        const currentVersion = getCurrentVersion();
         if (!currentResume) return;
-
-        const currentVersion = currentResume.versions.find(
-          (v) => v.versionId === currentVersionId
-        );
 
         if (!currentVersion) {
           if (currentResume.versions.length === 0) return;
-          // 버전이 선택되지 않았으면 첫 번째 버전 사용
           const firstVersion = currentResume.versions[0];
           set({
             currentVersionId: firstVersion.versionId,
@@ -393,7 +327,6 @@ export const useResumeStore = create<ResumeState>()(
         }
       },
 
-      // 변경사항 저장
       saveChanges: () => {
         const { currentResumeId, currentVersionId, draftVersion } = get();
         if (!currentResumeId || !currentVersionId || !draftVersion) return;
@@ -424,17 +357,10 @@ export const useResumeStore = create<ResumeState>()(
             resumes: updatedResumes,
             isEditing: false,
             draftVersion: null,
-            currentResumeId: currentResumeId,
-            currentVersionId: currentVersionId,
-            currentResume: updatedResumes.find((r) => r.id === currentResumeId),
-            currentVersion: updatedResumes
-              .find((r) => r.id === currentResumeId)
-              ?.versions.find((v) => v.versionId === currentVersionId),
           };
         });
       },
 
-      // 편집 취소
       cancelEditing: () => {
         set({
           isEditing: false,
@@ -442,15 +368,12 @@ export const useResumeStore = create<ResumeState>()(
         });
       },
 
-      // Block actions
       addBlock: (type) => {
-        const { currentResume, currentVersionId, isEditing, draftVersion } =
+        const { getCurrentResume, isEditing, draftVersion, currentVersionId } =
           get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return;
 
-        console.log("Adding block:", type);
-
-        // Create a new block based on type
         const newBlock: ResumeBlock = {
           id: crypto.randomUUID(),
           type,
@@ -458,7 +381,6 @@ export const useResumeStore = create<ResumeState>()(
           content: {},
         };
 
-        // Initialize content based on block type
         switch (type) {
           case "profile":
             newBlock.content = {
@@ -561,7 +483,6 @@ export const useResumeStore = create<ResumeState>()(
             break;
         }
 
-        // 편집 중이면 임시 버전에 블록 추가
         if (isEditing && draftVersion) {
           set({
             draftVersion: {
@@ -573,7 +494,6 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        // 편집 중이 아니면 편집 모드로 전환하고 임시 버전에 블록 추가
         const currentVersion =
           currentResume.versions.find(
             (v) => v.versionId === currentVersionId
@@ -594,7 +514,6 @@ export const useResumeStore = create<ResumeState>()(
       removeBlock: (blockId) => {
         const { isEditing, draftVersion } = get();
 
-        // 편집 중이면 임시 버전에서 블록 제거
         if (isEditing && draftVersion) {
           set({
             draftVersion: {
@@ -608,8 +527,8 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        // 편집 중이 아니면 편집 모드로 전환하고 임시 버전에서 블록 제거
-        const { currentResume, currentVersionId } = get();
+        const { getCurrentResume, currentVersionId } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return;
 
         const currentVersion =
@@ -634,7 +553,6 @@ export const useResumeStore = create<ResumeState>()(
       moveBlock: (fromIndex, toIndex) => {
         const { isEditing, draftVersion } = get();
 
-        // 편집 중이면 임시 버전에서 블록 이동
         if (isEditing && draftVersion) {
           const blocks = [...draftVersion.blocks];
           const [movedBlock] = blocks.splice(fromIndex, 1);
@@ -650,8 +568,8 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        // 편집 중이 아니면 편집 모드로 전환하고 임시 버전에서 블록 이동
-        const { currentResume, currentVersionId } = get();
+        const { getCurrentResume, currentVersionId } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return;
 
         const currentVersion =
@@ -676,7 +594,6 @@ export const useResumeStore = create<ResumeState>()(
       toggleBlockVisibility: (blockId) => {
         const { isEditing, draftVersion } = get();
 
-        // 편집 중이면 임시 버전에서 블록 가시성 토글
         if (isEditing && draftVersion) {
           const updatedBlocks = draftVersion.blocks.map((block) => {
             if (block.id === blockId) {
@@ -698,8 +615,8 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        // 편집 중이 아니면 편집 모드로 전환하고 임시 버전에서 블록 가시성 토글
-        const { currentResume, currentVersionId } = get();
+        const { getCurrentResume, currentVersionId } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return;
 
         const currentVersion =
@@ -730,12 +647,10 @@ export const useResumeStore = create<ResumeState>()(
       updateBlockContent: (blockId, content) => {
         const { isEditing, draftVersion } = get();
 
-        // 편집 중이면 임시 버전에서 블록 내용 업데이트
         if (isEditing && draftVersion) {
           const blockIndex = draftVersion.blocks.findIndex(
             (block) => block.id === blockId
           );
-
           if (blockIndex === -1) return;
 
           const updatedBlocks = [...draftVersion.blocks];
@@ -754,8 +669,8 @@ export const useResumeStore = create<ResumeState>()(
           return;
         }
 
-        // 편집 중이 아니면 편집 모드로 전환하고 임시 버전에서 블록 내용 업데이트
-        const { currentResume, currentVersionId } = get();
+        const { getCurrentResume, currentVersionId } = get();
+        const currentResume = getCurrentResume();
         if (!currentResume) return;
 
         const currentVersion =
@@ -769,7 +684,6 @@ export const useResumeStore = create<ResumeState>()(
         const blockIndex = newDraftVersion.blocks.findIndex(
           (block) => block.id === blockId
         );
-
         if (blockIndex === -1) return;
 
         newDraftVersion.blocks[blockIndex] = {
@@ -800,7 +714,6 @@ export const useResumeStore = create<ResumeState>()(
             }
             return resume;
           });
-
           return { resumes: updatedResumes };
         });
       },
@@ -820,13 +733,12 @@ export const useResumeStore = create<ResumeState>()(
             }
             return resume;
           });
-
           return { resumes: updatedResumes };
         });
       },
     }),
     {
-      name: "resume-storage", // name of the item in localStorage
+      name: "resume-storage",
       partialize: (state) => ({
         resumes: state.resumes,
         currentResumeId: state.currentResumeId,
@@ -842,11 +754,9 @@ export const initializeStore = () => {
   console.log("Initializing store with", resumes.length, "resumes");
 
   if (resumes.length === 0) {
-    // 이력서가 없는 경우 기본 이력서 생성
     const newResumeId = createResume("내 이력서", "classic");
     console.log("Created default resume with ID:", newResumeId);
   } else {
-    // 이력서가 있지만 선택된 이력서가 없는 경우 첫 번째 이력서 선택
     const { currentResumeId } = useResumeStore.getState();
     if (!currentResumeId) {
       selectResume(resumes[0].id);

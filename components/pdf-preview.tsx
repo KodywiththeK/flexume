@@ -14,8 +14,10 @@ interface PDFPreviewProps {
 }
 
 export default function PDFPreview({ onBack }: PDFPreviewProps) {
-  const { currentResume, currentVersion, isEditing, draftVersion } =
+  const { getCurrentResume, getCurrentVersion, isEditing, draftVersion } =
     useResumeStore();
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
   const previewVersion = isEditing ? draftVersion : currentVersion;
   const resumeRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -90,8 +92,8 @@ export default function PDFPreview({ onBack }: PDFPreviewProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col bg-gray-100">
+      <div className="container mx-auto flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={onBack}>
             <ArrowLeft size={16} className="mr-2" />
@@ -125,7 +127,7 @@ export default function PDFPreview({ onBack }: PDFPreviewProps) {
         </Button>
       </div>
 
-      <div className="bg-gray-100 p-6 rounded-lg flex justify-center min-h-[800px]">
+      <div className="p-6 rounded-lg flex justify-center min-h-[800px]">
         <div
           className="bg-white shadow-lg w-[210mm] min-h-[297mm]"
           ref={resumeRef}

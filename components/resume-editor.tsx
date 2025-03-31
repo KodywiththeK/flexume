@@ -14,7 +14,9 @@ import { ROUTES } from "@/constants/route";
 export default function ResumeEditor() {
   const router = useRouter();
   const [showPreview, setShowPreview] = useState(false);
-  const { currentResume, currentVersion } = useResumeStore();
+  const { getCurrentResume, getCurrentVersion } = useResumeStore();
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
 
   if (currentResume === null) redirect("/");
   if (currentVersion === null) router.push(ROUTES.RESUME_VERSIONS);

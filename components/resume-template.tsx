@@ -15,8 +15,10 @@ import AwardsBlock from "./template-blocks/awards-block";
 import EtcBlock from "./template-blocks/etc-block";
 
 export default function ResumeTemplate() {
-  const { currentResume, currentVersion, isEditing, draftVersion } =
+  const { getCurrentResume, getCurrentVersion, isEditing, draftVersion } =
     useResumeStore();
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
   const previewVersion = isEditing ? draftVersion : currentVersion;
 
   if (!currentResume || !previewVersion) {

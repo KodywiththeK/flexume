@@ -33,17 +33,17 @@ type Props = {
 
 export default function VersionManager({ setActiveTab }: Props) {
   const {
-    currentResume,
+    getCurrentResume,
     currentVersionId,
     selectVersion,
     createVersion,
     deleteVersion,
-    resumes,
   } = useResumeStore();
   const [newVersionName, setNewVersionName] = useState("");
   const [newVersionMemo, setNewVersionMemo] = useState("");
   const [newVersionTags, setNewVersionTags] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const currentResume = getCurrentResume();
 
   if (!currentResume) {
     return <div className="text-center py-10">No resume selected</div>;

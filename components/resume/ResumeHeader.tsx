@@ -16,13 +16,16 @@ export default function ResumeHeader({
   onDownload,
 }: ResumeHeaderProps) {
   const {
-    currentResume,
-    currentVersion,
+    getCurrentResume,
+    getCurrentVersion,
     isEditing,
     startEditing,
     saveChanges,
     cancelEditing,
   } = useResumeStore();
+
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
 
   return (
     <header className="flex items-center justify-between">

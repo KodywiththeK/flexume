@@ -3,8 +3,10 @@
 import { useResumeStore } from "@/store/resume-store";
 
 export default function DebugPanel() {
-  const { resumes, currentResume, currentVersion, isEditing } =
+  const { resumes, isEditing, getCurrentResume, getCurrentVersion } =
     useResumeStore();
+  const currentResume = getCurrentResume();
+  const currentVersion = getCurrentVersion();
   return (
     <div className="mt-6 p-4 bg-gray-100 rounded-md text-xs">
       <p>디버깅 정보:</p>
