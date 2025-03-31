@@ -3,15 +3,8 @@
 import { useState, useEffect } from "react";
 import { useResumeStore } from "@/store/resume-store";
 import { Plus, Trash2 } from "lucide-react";
-import type { ResumeBlock } from "@/types/resume";
+import type { ProfileData, ResumeBlock } from "@/types/resume";
 import { Button, Label, Input } from "@/components/ui";
-
-type ProfileData = {
-  name: string;
-  email: string;
-  phone: string;
-  links: { label: string; url: string }[];
-};
 
 type ProfileBlockProps = {
   block: ResumeBlock;
@@ -25,10 +18,12 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
       email: "",
       phone: "",
       links: [{ label: "GitHub", url: "" }],
+      birth: "",
+      address: "",
+      image: "",
     }
   );
 
-  // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
       setProfile(block.content);
@@ -69,10 +64,10 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">이름</Label>
+          <Label htmlFor="name">이름 (이력서 제목)</Label>
           <Input
             id="name"
             value={profile.name}
@@ -100,6 +95,68 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
           onChange={(e) => handleChange("phone", e.target.value)}
           placeholder="010-1234-5678"
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="birth">생년월일</Label>
+          <Input
+            id="birth"
+            type="date"
+            value={profile.birth}
+            onChange={(e) => handleChange("birth", e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="address">주소</Label>
+          <Input
+            id="address"
+            value={profile.address}
+            onChange={(e) => handleChange("address", e.target.value)}
+            placeholder="서울특별시 강남구"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>프로필 이미지</Label>
+        <div className="flex items-center gap-4">
+          {profile.image && (
+            <div className="relative w-32 h-32">
+              <img
+                src={profile.image}
+                alt="프로필 이미지"
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => handleChange("image", "")}
+                className="absolute -top-2 -right-2 text-destructive h-8 w-8"
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          )}
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    handleChange("image", reader.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="cursor-pointer"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2">

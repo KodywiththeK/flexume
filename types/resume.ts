@@ -16,6 +16,16 @@ export type BlockStyle = {
   marginBottom?: string;
 };
 
+export type ProfileData = {
+  name: string;
+  email: string;
+  phone: string;
+  links: { label: string; url: string }[];
+  birth: string;
+  address: string;
+  image: string;
+};
+
 export type ResumeBlock = {
   id: string;
   type: BlockType;

@@ -1,40 +1,30 @@
-import type { ResumeBlock } from "@/types/resume"
+import type { ResumeBlock } from "@/types/resume";
+import MarkdownViewer from "../utils/MarkdownViewer";
+import TemplateHeading from "./TemplateHeading";
 
 interface SummaryBlockProps {
-  block: ResumeBlock
-  templateType: "classic" | "modern" | "minimal"
+  block: ResumeBlock;
+  templateType: "classic" | "modern" | "minimal";
 }
 
-export default function SummaryBlock({ block, templateType }: SummaryBlockProps) {
-  const { content } = block
+export default function SummaryBlock({
+  block,
+  templateType,
+}: SummaryBlockProps) {
+  const { content } = block;
 
-  if (!content || !content.content) return null
-
-  // Template-specific styles
-  const getHeaderClass = () => {
-    switch (templateType) {
-      case "modern":
-        return "text-[var(--accent-color)] border-b border-[var(--accent-color)] pb-1"
-      case "minimal":
-        return "text-gray-700 pb-1"
-      case "classic":
-      default:
-        return "border-b border-gray-400 pb-1"
-    }
-  }
+  if (!content || !content.content) return null;
 
   return (
     <div className="summary-block mb-[var(--block-spacing)]">
-      <h2 className={`text-xl font-bold mb-3 ${getHeaderClass()}`}>자기소개</h2>
+      <TemplateHeading templateType={templateType}>
+        Introduction.
+      </TemplateHeading>
 
-      <div className="summary-content">
-        {content.content.split("\n").map((paragraph, index) => (
-          <p key={index} className="mb-2">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      <MarkdownViewer
+        markdown={content.content}
+        className="text-sm text-gray-800 space-y-2"
+      />
     </div>
-  )
+  );
 }
-

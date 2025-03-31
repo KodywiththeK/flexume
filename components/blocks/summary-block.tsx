@@ -41,7 +41,7 @@ export default function SummaryBlock({ block }: SummaryBlockProps) {
         value={summary.content}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="간략한 자기소개를 작성해주세요."
-        className="min-h-[120px]"
+        className="min-h-40"
       />
     </div>
   );

@@ -4,10 +4,11 @@ import { useResumeStore } from "@/store/resume-store";
 import ResumeBlockItem from "./resume/ResumeBlockItem";
 
 export default function ResumeBlocks() {
-  const { getCurrentVersion, moveBlock, isEditing } = useResumeStore();
+  const { getCurrentVersion, moveBlock, isEditing, draftVersion } =
+    useResumeStore();
   const currentVersion = getCurrentVersion();
 
-  const blocks = currentVersion?.blocks;
+  const blocks = isEditing ? draftVersion?.blocks : currentVersion?.blocks;
 
   if (!currentVersion) {
     return <div className="text-center py-10">No resume version selected</div>;

@@ -1,70 +1,100 @@
-import type { ResumeBlock } from "@/types/resume"
+import type { ProfileData, ResumeBlock } from "@/types/resume";
+import { Heading1, Heading2, Heading3 } from "@/components/ui";
 
 interface ProfileBlockProps {
-  block: ResumeBlock
-  templateType: "classic" | "modern" | "minimal"
+  block: ResumeBlock;
+  templateType: "classic" | "modern" | "minimal";
 }
 
-export default function ProfileBlock({ block, templateType }: ProfileBlockProps) {
-  const { content } = block
+export default function ProfileBlock({
+  block,
+  templateType,
+}: ProfileBlockProps) {
+  const { content } = block;
 
-  if (!content) return null
+  if (!content) return null;
 
-  const { name, email, phone, links } = content
+  const { name, email, phone, links, birth, address, image } =
+    content as ProfileData;
 
   // Template-specific styles
   const getHeaderClass = () => {
     switch (templateType) {
       case "modern":
-        return "border-b-2 border-[var(--accent-color)] pb-2 mb-4"
+        return "border-b-2 border-[var(--accent-color)] pb-2 mb-4";
       case "minimal":
-        return "border-b border-gray-200 pb-2 mb-4"
+        return "border-b border-gray-200 pb-2 mb-4";
       case "classic":
       default:
-        return "border-b-2 border-gray-800 pb-2 mb-4"
+        return "border-b-2 border-gray-800 pb-2 mb-4";
     }
-  }
+  };
 
   return (
-    <div className="profile-block mb-[var(--block-spacing)]">
-      <div className="profile-header">
-        <h1 className="text-3xl font-bold mb-2">{name}</h1>
-
-        <div className="contact-info flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          {email && (
-            <div className="email">
-              <span className="font-medium">이메일:</span> {email}
-            </div>
-          )}
-
-          {phone && (
-            <div className="phone">
-              <span className="font-medium">연락처:</span> {phone}
-            </div>
-          )}
-
-          {links &&
-            links.length > 0 &&
-            links.map(
-              (link, index) =>
-                link.label &&
-                link.url && (
-                  <div key={index} className="link">
-                    <span className="font-medium">{link.label}:</span>{" "}
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[var(--accent-color)] hover:underline"
-                    >
-                      {link.url}
-                    </a>
-                  </div>
-                ),
-            )}
+    <div className="w-full flex flex-col gap-6 mb-8">
+      <Heading1>{name}</Heading1>
+      <div className="flex gap-8">
+        <div className="w-32 aspect-[3/4] rounded overflow-hidden">
+          <img
+            src={image}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5 text-sm">
+            <Heading3 className="text-lime-600">Personal Info.</Heading3>
+            <ul className="flex flex-col list-disc list-inside font-normal text-gray-800 gap-1">
+              {birth && (
+                <li className="birth space-x-2">
+                  <span className="font-bold">Birth.</span>
+                  <span>{birth.replaceAll("-", ". ")}</span>
+                </li>
+              )}
+              {address && (
+                <li className="address space-x-2">
+                  <span className="font-bold">Address.</span>
+                  <span>{address}</span>
+                </li>
+              )}
+              {(email || phone) && (
+                <li className="contact space-x-2">
+                  <span className="font-bold">Contact.</span>
+                  <span className="space-x-1">
+                    {phone && <span>{phone}</span>}
+                    {email && phone && <span>{"|"}</span>}
+                    {email && <span>{email}</span>}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-1.5 text-sm">
+            <Heading3 className="text-lime-600">Channels.</Heading3>
+            <ul className="flex flex-col list-disc list-inside font-normal gap-1">
+              {links &&
+                links.length > 0 &&
+                links.map(
+                  ({ label, url }, index) =>
+                    label &&
+                    url && (
+                      <li key={index} className="link space-x-2">
+                        <span className="font-bold">{label}.</span>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          {url}
+                        </a>
+                      </li>
+                    )
+                )}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

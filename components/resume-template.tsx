@@ -133,7 +133,7 @@ export default function ResumeTemplate() {
       className={`resume-template ${getTemplateClasses()}`}
       style={templateStyles}
     >
-      <div className="resume-content p-8 md:p-12">
+      <div className="p-12 md:p-16">
         {previewVersion.blocks.map(renderBlock)}
       </div>
     </div>
