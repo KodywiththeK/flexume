@@ -2,8 +2,6 @@
 
 import { useResumeStore } from "@/store/resume-store";
 import { GripVertical, Eye, EyeOff, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import ProfileBlock from "../blocks/profile-block";
 import SummaryBlock from "../blocks/summary-block";
 import ExperienceBlock from "../blocks/experience-block";
@@ -14,6 +12,7 @@ import CertificationsBlock from "../blocks/certifications-block";
 import AwardsBlock from "../blocks/awards-block";
 import EtcBlock from "../blocks/etc-block";
 import { useDragDrop } from "@/hooks/use-dnd";
+import { Card, CardContent, Button } from "@/components/ui";
 
 interface BlockItemProps {
   block: any; // ResumeBlock (타입 정의에 맞게 변경)

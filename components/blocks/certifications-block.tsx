@@ -1,33 +1,38 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useResumeStore } from "@/store/resume-store"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Trash2 } from "lucide-react"
-import type { ResumeBlock } from "@/types/resume"
+import { useState, useEffect } from "react";
+import { useResumeStore } from "@/store/resume-store";
+import { Plus, Trash2 } from "lucide-react";
+import type { ResumeBlock } from "@/types/resume";
+import {
+  Card,
+  CardContent,
+  Button,
+  Label,
+  Input,
+  Textarea,
+} from "@/components/ui";
 
 type CertificationItem = {
-  id: string
-  name: string
-  issuer: string
-  date: string
-  description: string
-}
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  description: string;
+};
 
 type CertificationsData = {
-  items: CertificationItem[]
-}
+  items: CertificationItem[];
+};
 
 type CertificationsBlockProps = {
-  block: ResumeBlock
-}
+  block: ResumeBlock;
+};
 
-export default function CertificationsBlock({ block }: CertificationsBlockProps) {
-  const { updateBlockContent } = useResumeStore()
+export default function CertificationsBlock({
+  block,
+}: CertificationsBlockProps) {
+  const { updateBlockContent } = useResumeStore();
   const [certifications, setCertifications] = useState<CertificationsData>(
     block.content || {
       items: [
@@ -39,24 +44,28 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
           description: "",
         },
       ],
-    },
-  )
+    }
+  );
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setCertifications(block.content)
+      setCertifications(block.content);
     }
-  }, [block.content])
+  }, [block.content]);
 
-  const handleItemChange = (index: number, field: keyof CertificationItem, value: string) => {
-    const updatedItems = [...certifications.items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
+  const handleItemChange = (
+    index: number,
+    field: keyof CertificationItem,
+    value: string
+  ) => {
+    const updatedItems = [...certifications.items];
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    const updatedCertifications = { ...certifications, items: updatedItems }
-    setCertifications(updatedCertifications)
-    updateBlockContent(block.id, updatedCertifications)
-  }
+    const updatedCertifications = { ...certifications, items: updatedItems };
+    setCertifications(updatedCertifications);
+    updateBlockContent(block.id, updatedCertifications);
+  };
 
   const addCertificationItem = () => {
     const updatedItems = [
@@ -68,19 +77,19 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
         date: "",
         description: "",
       },
-    ]
+    ];
 
-    const updatedCertifications = { ...certifications, items: updatedItems }
-    setCertifications(updatedCertifications)
-    updateBlockContent(block.id, updatedCertifications)
-  }
+    const updatedCertifications = { ...certifications, items: updatedItems };
+    setCertifications(updatedCertifications);
+    updateBlockContent(block.id, updatedCertifications);
+  };
 
   const removeCertificationItem = (index: number) => {
-    const updatedItems = certifications.items.filter((_, i) => i !== index)
-    const updatedCertifications = { ...certifications, items: updatedItems }
-    setCertifications(updatedCertifications)
-    updateBlockContent(block.id, updatedCertifications)
-  }
+    const updatedItems = certifications.items.filter((_, i) => i !== index);
+    const updatedCertifications = { ...certifications, items: updatedItems };
+    setCertifications(updatedCertifications);
+    updateBlockContent(block.id, updatedCertifications);
+  };
 
   return (
     <div className="space-y-6">
@@ -107,7 +116,9 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
                 <Input
                   id={`name-${itemIndex}`}
                   value={item.name}
-                  onChange={(e) => handleItemChange(itemIndex, "name", e.target.value)}
+                  onChange={(e) =>
+                    handleItemChange(itemIndex, "name", e.target.value)
+                  }
                   placeholder="정보처리기사"
                 />
               </div>
@@ -118,7 +129,9 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
                   <Input
                     id={`issuer-${itemIndex}`}
                     value={item.issuer}
-                    onChange={(e) => handleItemChange(itemIndex, "issuer", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "issuer", e.target.value)
+                    }
                     placeholder="한국산업인력공단"
                   />
                 </div>
@@ -128,17 +141,23 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
                     id={`date-${itemIndex}`}
                     type="date"
                     value={item.date}
-                    onChange={(e) => handleItemChange(itemIndex, "date", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "date", e.target.value)
+                    }
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`description-${itemIndex}`}>설명 (선택사항)</Label>
+                <Label htmlFor={`description-${itemIndex}`}>
+                  설명 (선택사항)
+                </Label>
                 <Textarea
                   id={`description-${itemIndex}`}
                   value={item.description}
-                  onChange={(e) => handleItemChange(itemIndex, "description", e.target.value)}
+                  onChange={(e) =>
+                    handleItemChange(itemIndex, "description", e.target.value)
+                  }
                   placeholder="자격증에 대한 추가 설명을 입력하세요."
                 />
               </div>
@@ -147,11 +166,15 @@ export default function CertificationsBlock({ block }: CertificationsBlockProps)
         </Card>
       ))}
 
-      <Button type="button" variant="outline" onClick={addCertificationItem} className="w-full">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={addCertificationItem}
+        className="w-full"
+      >
         <Plus size={16} className="mr-2" />
         자격증 추가
       </Button>
     </div>
-  )
+  );
 }
-

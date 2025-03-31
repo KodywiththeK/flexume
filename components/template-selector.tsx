@@ -1,18 +1,20 @@
 "use client";
 
 import { useResumeStore } from "@/store/resume-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
+  RadioGroup,
+  RadioGroupItem,
+  Label,
+  Card,
+  CardContent,
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+  SelectContent,
+  SelectItem,
+  Slider,
+  Input,
+} from "@/components/ui";
 
 export default function TemplateSelector() {
   const { getCurrentResume, updateTemplate, updateTemplateStyle } =

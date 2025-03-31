@@ -1,14 +1,11 @@
-// components/resume/ResumeEditorHeader.tsx
 "use client";
 
-import { useState } from "react";
 import { useResumeStore } from "@/store/resume-store";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Plus, Save, X, Eye, Download } from "lucide-react";
 import CreateResumeDialog from "./CreateResumeDialog";
 import ResumeSelector from "./ResumeSelector";
 import { useSearchParams } from "next/navigation";
+import { Badge, Button } from "@/components/ui";
 
 export default function ResumeEditorHeader({
   onShowPreview,

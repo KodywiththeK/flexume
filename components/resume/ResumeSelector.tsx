@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui";
 import { useResumeStore } from "@/store/resume-store";
 
 interface ResumeSelectorProps {

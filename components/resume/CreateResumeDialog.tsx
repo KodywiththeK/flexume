@@ -1,6 +1,10 @@
 "use client";
 
 import { PropsWithChildren, useState } from "react";
+import { TEMPLATE_DESCRIPTIONS, TEMPLATES } from "@/constants/resume";
+import { useResumeStore } from "@/store/resume-store";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/constants/route";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +13,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { TEMPLATE_DESCRIPTIONS, TEMPLATES } from "@/constants/resume";
-import { useResumeStore } from "@/store/resume-store";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "@/constants/route";
+  Input,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+  Button,
+} from "@/components/ui";
 
 export default function CreateResumeDialog({ children }: PropsWithChildren) {
   const { createResume } = useResumeStore();

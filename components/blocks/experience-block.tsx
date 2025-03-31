@@ -1,37 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useResumeStore } from "@/store/resume-store"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Trash2 } from "lucide-react"
-import type { ResumeBlock } from "@/types/resume"
+import { useState, useEffect } from "react";
+import { useResumeStore } from "@/store/resume-store";
+import { Plus, Trash2 } from "lucide-react";
+import type { ResumeBlock } from "@/types/resume";
+import {
+  Card,
+  CardContent,
+  Button,
+  Label,
+  Input,
+  Checkbox,
+  Textarea,
+} from "@/components/ui";
 
 type ExperienceItem = {
-  id: string
-  company: string
-  position: string
-  startDate: string
-  endDate: string
-  isCurrentPosition: boolean
-  description: string
-  achievements: string[]
-}
+  id: string;
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  isCurrentPosition: boolean;
+  description: string;
+  achievements: string[];
+};
 
 type ExperienceData = {
-  items: ExperienceItem[]
-}
+  items: ExperienceItem[];
+};
 
 type ExperienceBlockProps = {
-  block: ResumeBlock
-}
+  block: ResumeBlock;
+};
 
 export default function ExperienceBlock({ block }: ExperienceBlockProps) {
-  const { updateBlockContent } = useResumeStore()
+  const { updateBlockContent } = useResumeStore();
   const [experience, setExperience] = useState<ExperienceData>(
     block.content || {
       items: [
@@ -46,65 +49,75 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
           achievements: [""],
         },
       ],
-    },
-  )
+    }
+  );
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setExperience(block.content)
+      setExperience(block.content);
     }
-  }, [block.content])
+  }, [block.content]);
 
-  const handleItemChange = (index: number, field: keyof ExperienceItem, value: any) => {
-    const updatedItems = [...experience.items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
+  const handleItemChange = (
+    index: number,
+    field: keyof ExperienceItem,
+    value: any
+  ) => {
+    const updatedItems = [...experience.items];
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
-  const handleAchievementChange = (itemIndex: number, achievementIndex: number, value: string) => {
-    const updatedItems = [...experience.items]
-    const updatedAchievements = [...updatedItems[itemIndex].achievements]
-    updatedAchievements[achievementIndex] = value
+  const handleAchievementChange = (
+    itemIndex: number,
+    achievementIndex: number,
+    value: string
+  ) => {
+    const updatedItems = [...experience.items];
+    const updatedAchievements = [...updatedItems[itemIndex].achievements];
+    updatedAchievements[achievementIndex] = value;
 
     updatedItems[itemIndex] = {
       ...updatedItems[itemIndex],
       achievements: updatedAchievements,
-    }
+    };
 
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
   const addAchievement = (itemIndex: number) => {
-    const updatedItems = [...experience.items]
+    const updatedItems = [...experience.items];
     updatedItems[itemIndex] = {
       ...updatedItems[itemIndex],
       achievements: [...updatedItems[itemIndex].achievements, ""],
-    }
+    };
 
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
   const removeAchievement = (itemIndex: number, achievementIndex: number) => {
-    const updatedItems = [...experience.items]
-    const updatedAchievements = updatedItems[itemIndex].achievements.filter((_, i) => i !== achievementIndex)
+    const updatedItems = [...experience.items];
+    const updatedAchievements = updatedItems[itemIndex].achievements.filter(
+      (_, i) => i !== achievementIndex
+    );
 
     updatedItems[itemIndex] = {
       ...updatedItems[itemIndex],
       achievements: updatedAchievements,
-    }
+    };
 
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
   const addExperienceItem = () => {
     const updatedItems = [
@@ -119,19 +132,19 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
         description: "",
         achievements: [""],
       },
-    ]
+    ];
 
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
   const removeExperienceItem = (index: number) => {
-    const updatedItems = experience.items.filter((_, i) => i !== index)
-    const updatedExperience = { ...experience, items: updatedItems }
-    setExperience(updatedExperience)
-    updateBlockContent(block.id, updatedExperience)
-  }
+    const updatedItems = experience.items.filter((_, i) => i !== index);
+    const updatedExperience = { ...experience, items: updatedItems };
+    setExperience(updatedExperience);
+    updateBlockContent(block.id, updatedExperience);
+  };
 
   return (
     <div className="space-y-6">
@@ -159,7 +172,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                   <Input
                     id={`company-${itemIndex}`}
                     value={item.company}
-                    onChange={(e) => handleItemChange(itemIndex, "company", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "company", e.target.value)
+                    }
                     placeholder="회사명"
                   />
                 </div>
@@ -168,7 +183,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                   <Input
                     id={`position-${itemIndex}`}
                     value={item.position}
-                    onChange={(e) => handleItemChange(itemIndex, "position", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "position", e.target.value)
+                    }
                     placeholder="프론트엔드 개발자"
                   />
                 </div>
@@ -181,7 +198,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                     id={`startDate-${itemIndex}`}
                     type="date"
                     value={item.startDate}
-                    onChange={(e) => handleItemChange(itemIndex, "startDate", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "startDate", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -191,7 +210,13 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                       <Checkbox
                         id={`current-${itemIndex}`}
                         checked={item.isCurrentPosition}
-                        onCheckedChange={(checked) => handleItemChange(itemIndex, "isCurrentPosition", checked)}
+                        onCheckedChange={(checked) =>
+                          handleItemChange(
+                            itemIndex,
+                            "isCurrentPosition",
+                            checked
+                          )
+                        }
                       />
                       <label
                         htmlFor={`current-${itemIndex}`}
@@ -205,7 +230,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                     id={`endDate-${itemIndex}`}
                     type="date"
                     value={item.endDate}
-                    onChange={(e) => handleItemChange(itemIndex, "endDate", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "endDate", e.target.value)
+                    }
                     disabled={item.isCurrentPosition}
                   />
                 </div>
@@ -216,7 +243,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                 <Textarea
                   id={`description-${itemIndex}`}
                   value={item.description}
-                  onChange={(e) => handleItemChange(itemIndex, "description", e.target.value)}
+                  onChange={(e) =>
+                    handleItemChange(itemIndex, "description", e.target.value)
+                  }
                   placeholder="담당했던 업무에 대해 간략히 설명해주세요."
                 />
               </div>
@@ -237,10 +266,19 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                 </div>
 
                 {item.achievements.map((achievement, achievementIndex) => (
-                  <div key={achievementIndex} className="flex gap-2 items-start">
+                  <div
+                    key={achievementIndex}
+                    className="flex gap-2 items-start"
+                  >
                     <Input
                       value={achievement}
-                      onChange={(e) => handleAchievementChange(itemIndex, achievementIndex, e.target.value)}
+                      onChange={(e) =>
+                        handleAchievementChange(
+                          itemIndex,
+                          achievementIndex,
+                          e.target.value
+                        )
+                      }
                       placeholder="주요 성과를 입력하세요"
                       className="flex-1"
                     />
@@ -249,7 +287,9 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeAchievement(itemIndex, achievementIndex)}
+                        onClick={() =>
+                          removeAchievement(itemIndex, achievementIndex)
+                        }
                         className="text-destructive h-10 w-10"
                       >
                         <Trash2 size={16} />
@@ -263,11 +303,15 @@ export default function ExperienceBlock({ block }: ExperienceBlockProps) {
         </Card>
       ))}
 
-      <Button type="button" variant="outline" onClick={addExperienceItem} className="w-full">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={addExperienceItem}
+        className="w-full"
+      >
         <Plus size={16} className="mr-2" />
         경력 추가
       </Button>
     </div>
-  )
+  );
 }
-

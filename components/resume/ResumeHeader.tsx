@@ -1,11 +1,8 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Download, Eye, Save, X } from "lucide-react";
 import { useResumeStore } from "@/store/resume-store";
 import ResumeSelector from "./ResumeSelector";
-
+import { Badge, Button } from "@/components/ui";
 interface ResumeHeaderProps {
   onPreview: () => void;
   onDownload: () => void;

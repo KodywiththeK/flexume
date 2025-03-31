@@ -1,39 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useResumeStore } from "@/store/resume-store"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import type { ResumeBlock } from "@/types/resume"
-
+import { useState, useEffect } from "react";
+import { useResumeStore } from "@/store/resume-store";
+import type { ResumeBlock } from "@/types/resume";
+import { Label, Textarea } from "@/components/ui";
 type SummaryData = {
-  content: string
-}
+  content: string;
+};
 
 type SummaryBlockProps = {
-  block: ResumeBlock
-}
+  block: ResumeBlock;
+};
 
 export default function SummaryBlock({ block }: SummaryBlockProps) {
-  const { updateBlockContent } = useResumeStore()
+  const { updateBlockContent } = useResumeStore();
   const [summary, setSummary] = useState<SummaryData>(
     block.content || {
       content: "",
-    },
-  )
+    }
+  );
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setSummary(block.content)
+      setSummary(block.content);
     }
-  }, [block.content])
+  }, [block.content]);
 
   const handleChange = (value: string) => {
-    const updatedSummary = { ...summary, content: value }
-    setSummary(updatedSummary)
-    updateBlockContent(block.id, updatedSummary)
-  }
+    const updatedSummary = { ...summary, content: value };
+    setSummary(updatedSummary);
+    updateBlockContent(block.id, updatedSummary);
+  };
 
   return (
     <div className="space-y-2">
@@ -46,6 +44,5 @@ export default function SummaryBlock({ block }: SummaryBlockProps) {
         className="min-h-[120px]"
       />
     </div>
-  )
+  );
 }
-

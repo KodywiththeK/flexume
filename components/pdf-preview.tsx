@@ -2,12 +2,11 @@
 
 import { useRef, useState } from "react";
 import { useResumeStore } from "@/store/resume-store";
-import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft } from "lucide-react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import ResumeTemplate from "./resume-template";
-import { Badge } from "@/components/ui/badge";
+import { Badge, Button } from "@/components/ui";
 
 interface PDFPreviewProps {
   onBack: () => void;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useResumeStore } from "@/store/resume-store";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CreateResumeDialog from "@/components/resume/CreateResumeDialog";

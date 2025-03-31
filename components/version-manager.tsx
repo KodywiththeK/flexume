@@ -1,8 +1,7 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useResumeStore } from "@/store/resume-store";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,8 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,11 +17,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+  Input,
+  Label,
+  Textarea,
+  Badge,
+} from "@/components/ui";
 import { Copy, Edit, Trash2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 

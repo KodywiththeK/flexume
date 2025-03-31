@@ -1,36 +1,43 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useResumeStore } from "@/store/resume-store"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Trash2 } from "lucide-react"
-import type { ResumeBlock } from "@/types/resume"
+import { useState, useEffect } from "react";
+import { useResumeStore } from "@/store/resume-store";
+import { Plus, Trash2 } from "lucide-react";
+import type { ResumeBlock } from "@/types/resume";
+import {
+  Card,
+  CardContent,
+  Button,
+  Label,
+  Input,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui";
 
 type EducationItem = {
-  id: string
-  school: string
-  degree: string
-  field: string
-  startDate: string
-  endDate: string
-  status: "graduated" | "attending" | "leave" | "expected"
-  gpa?: string
-}
+  id: string;
+  school: string;
+  degree: string;
+  field: string;
+  startDate: string;
+  endDate: string;
+  status: "graduated" | "attending" | "leave" | "expected";
+  gpa?: string;
+};
 
 type EducationData = {
-  items: EducationItem[]
-}
+  items: EducationItem[];
+};
 
 type EducationBlockProps = {
-  block: ResumeBlock
-}
+  block: ResumeBlock;
+};
 
 export default function EducationBlock({ block }: EducationBlockProps) {
-  const { updateBlockContent } = useResumeStore()
+  const { updateBlockContent } = useResumeStore();
   const [education, setEducation] = useState<EducationData>(
     block.content || {
       items: [
@@ -44,24 +51,28 @@ export default function EducationBlock({ block }: EducationBlockProps) {
           status: "graduated",
         },
       ],
-    },
-  )
+    }
+  );
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setEducation(block.content)
+      setEducation(block.content);
     }
-  }, [block.content])
+  }, [block.content]);
 
-  const handleItemChange = (index: number, field: keyof EducationItem, value: any) => {
-    const updatedItems = [...education.items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
+  const handleItemChange = (
+    index: number,
+    field: keyof EducationItem,
+    value: any
+  ) => {
+    const updatedItems = [...education.items];
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    const updatedEducation = { ...education, items: updatedItems }
-    setEducation(updatedEducation)
-    updateBlockContent(block.id, updatedEducation)
-  }
+    const updatedEducation = { ...education, items: updatedItems };
+    setEducation(updatedEducation);
+    updateBlockContent(block.id, updatedEducation);
+  };
 
   const addEducationItem = () => {
     const updatedItems = [
@@ -75,19 +86,19 @@ export default function EducationBlock({ block }: EducationBlockProps) {
         endDate: "",
         status: "graduated",
       },
-    ]
+    ] as EducationData["items"];
 
-    const updatedEducation = { ...education, items: updatedItems }
-    setEducation(updatedEducation)
-    updateBlockContent(block.id, updatedEducation)
-  }
+    const updatedEducation = { ...education, items: updatedItems };
+    setEducation(updatedEducation);
+    updateBlockContent(block.id, updatedEducation);
+  };
 
   const removeEducationItem = (index: number) => {
-    const updatedItems = education.items.filter((_, i) => i !== index)
-    const updatedEducation = { ...education, items: updatedItems }
-    setEducation(updatedEducation)
-    updateBlockContent(block.id, updatedEducation)
-  }
+    const updatedItems = education.items.filter((_, i) => i !== index);
+    const updatedEducation = { ...education, items: updatedItems };
+    setEducation(updatedEducation);
+    updateBlockContent(block.id, updatedEducation);
+  };
 
   return (
     <div className="space-y-6">
@@ -114,7 +125,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                 <Input
                   id={`school-${itemIndex}`}
                   value={item.school}
-                  onChange={(e) => handleItemChange(itemIndex, "school", e.target.value)}
+                  onChange={(e) =>
+                    handleItemChange(itemIndex, "school", e.target.value)
+                  }
                   placeholder="서울대학교"
                 />
               </div>
@@ -125,7 +138,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                   <Input
                     id={`degree-${itemIndex}`}
                     value={item.degree}
-                    onChange={(e) => handleItemChange(itemIndex, "degree", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "degree", e.target.value)
+                    }
                     placeholder="학사"
                   />
                 </div>
@@ -134,7 +149,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                   <Input
                     id={`field-${itemIndex}`}
                     value={item.field}
-                    onChange={(e) => handleItemChange(itemIndex, "field", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "field", e.target.value)
+                    }
                     placeholder="컴퓨터공학"
                   />
                 </div>
@@ -147,7 +164,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                     id={`startDate-${itemIndex}`}
                     type="date"
                     value={item.startDate}
-                    onChange={(e) => handleItemChange(itemIndex, "startDate", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "startDate", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -156,7 +175,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                     id={`endDate-${itemIndex}`}
                     type="date"
                     value={item.endDate}
-                    onChange={(e) => handleItemChange(itemIndex, "endDate", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "endDate", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -166,7 +187,13 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                   <Label htmlFor={`status-${itemIndex}`}>상태</Label>
                   <Select
                     value={item.status}
-                    onValueChange={(value) => handleItemChange(itemIndex, "status", value as EducationItem["status"])}
+                    onValueChange={(value) =>
+                      handleItemChange(
+                        itemIndex,
+                        "status",
+                        value as EducationItem["status"]
+                      )
+                    }
                   >
                     <SelectTrigger id={`status-${itemIndex}`}>
                       <SelectValue placeholder="상태 선택" />
@@ -184,7 +211,9 @@ export default function EducationBlock({ block }: EducationBlockProps) {
                   <Input
                     id={`gpa-${itemIndex}`}
                     value={item.gpa || ""}
-                    onChange={(e) => handleItemChange(itemIndex, "gpa", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(itemIndex, "gpa", e.target.value)
+                    }
                     placeholder="4.5 / 4.5"
                   />
                 </div>
@@ -194,11 +223,15 @@ export default function EducationBlock({ block }: EducationBlockProps) {
         </Card>
       ))}
 
-      <Button type="button" variant="outline" onClick={addEducationItem} className="w-full">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={addEducationItem}
+        className="w-full"
+      >
         <Plus size={16} className="mr-2" />
         학력 추가
       </Button>
     </div>
-  )
+  );
 }
-
