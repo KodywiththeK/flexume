@@ -28,7 +28,7 @@ import { Copy, Edit, Trash2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 type Props = {
-  setActiveTab: Dispatch<SetStateAction<string>>;
+  setActiveTab: (value: string) => void;
 };
 
 export default function VersionManager({ setActiveTab }: Props) {

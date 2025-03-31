@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/common/Header";
 
 export const metadata: Metadata = {
   title: "Flexume",
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Header />
         <main className="min-h-screen bg-gray-50">{children}</main>
       </body>
     </html>
