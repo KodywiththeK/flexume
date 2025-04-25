@@ -66,4 +66,3 @@ export default function ExperienceBlock({ block, templateType }: ExperienceBlock
     </div>
   )
 }
-

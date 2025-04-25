@@ -1,15 +1,9 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useResumeStore } from "@/store/resume-store";
+import { useState } from "react"
+import { useResumeStore } from "@/store/resume-store"
+import { Copy, Edit, Trash2 } from "lucide-react"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,34 +11,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Input,
-  Label,
-  Textarea,
-  Badge,
-} from "@/components/ui";
-import { Copy, Edit, Trash2 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+} from "@/components/ui/dialog"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 
 type Props = {
-  setActiveTab: (value: string) => void;
-};
+  setActiveTab: (value: string) => void
+}
 
 export default function VersionManager({ setActiveTab }: Props) {
-  const {
-    getCurrentResume,
-    currentVersionId,
-    selectVersion,
-    createVersion,
-    deleteVersion,
-  } = useResumeStore();
-  const [newVersionName, setNewVersionName] = useState("");
-  const [newVersionMemo, setNewVersionMemo] = useState("");
-  const [newVersionTags, setNewVersionTags] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const currentResume = getCurrentResume();
+  const { getCurrentResume, currentVersionId, selectVersion, createVersion, deleteVersion } = useResumeStore()
+  const [newVersionName, setNewVersionName] = useState("")
+  const [newVersionMemo, setNewVersionMemo] = useState("")
+  const [newVersionTags, setNewVersionTags] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const currentResume = getCurrentResume()
 
   if (!currentResume) {
-    return <div className="text-center py-10">No resume selected</div>;
+    return <div className="text-center py-10">No resume selected</div>
   }
 
   const handleCreateVersion = () => {
@@ -52,12 +40,12 @@ export default function VersionManager({ setActiveTab }: Props) {
       name: newVersionName,
       memo: newVersionMemo,
       tags: newVersionTags.split(",").map((tag) => tag.trim()),
-    });
-    setNewVersionName("");
-    setNewVersionMemo("");
-    setNewVersionTags("");
-    setIsDialogOpen(false);
-  };
+    })
+    setNewVersionName("")
+    setNewVersionMemo("")
+    setNewVersionTags("")
+    setIsDialogOpen(false)
+  }
 
   return (
     <div className="space-y-6">
@@ -70,9 +58,7 @@ export default function VersionManager({ setActiveTab }: Props) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>새 이력서 버전 생성</DialogTitle>
-              <DialogDescription>
-                현재 이력서를 복사하여 새 버전을 만듭니다.
-              </DialogDescription>
+              <DialogDescription>현재 이력서를 복사하여 새 버전을 만듭니다.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
@@ -114,25 +100,19 @@ export default function VersionManager({ setActiveTab }: Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentResume.versions.map((version) => (
+        {currentResume.versions.map((version: any) => (
           <Card
             key={version.versionId}
-            className={`${
-              version.versionId === currentVersionId
-                ? "border-primary"
-                : "border-border"
-            }`}
+            className={`${version.versionId === currentVersionId ? "border-primary" : "border-border"}`}
           >
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">{version.name}</CardTitle>
-              <CardDescription>
-                마지막 수정: {formatDate(version.lastEditedAt)}
-              </CardDescription>
+              <CardDescription>마지막 수정: {version.lastEditedAt}</CardDescription>
             </CardHeader>
             <CardContent className="pb-2">
               {version.memo && <p className="text-sm mb-2">{version.memo}</p>}
               <div className="flex flex-wrap gap-1 mt-2">
-                {version.tags?.map((tag, index) => (
+                {version.tags?.map((tag: any, index: number) => (
                   <Badge key={index} variant="secondary">
                     {tag}
                   </Badge>
@@ -164,8 +144,8 @@ export default function VersionManager({ setActiveTab }: Props) {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    selectVersion(version.versionId);
-                    setActiveTab("edit");
+                    selectVersion(version.versionId)
+                    setActiveTab("edit")
                   }}
                 >
                   <Edit size={16} className="mr-1" />
@@ -177,5 +157,5 @@ export default function VersionManager({ setActiveTab }: Props) {
         ))}
       </div>
     </div>
-  );
+  )
 }

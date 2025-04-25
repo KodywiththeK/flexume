@@ -1,57 +1,48 @@
-"use client";
-
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type {
-  BlockType,
-  Resume,
-  ResumeBlock,
-  ResumeVersion,
-} from "@/types/resume";
+"use client"
+import type { BlockType, Resume, ResumeBlock, ResumeVersion } from "@/types/resume"
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface ResumeState {
-  resumes: Resume[];
-  currentResumeId: string | null;
-  currentVersionId: string | null;
+  resumes: Resume[]
+  currentResumeId: string | null
+  currentVersionId: string | null
 
   // 임시 편집 상태 관리를 위한 필드 추가
-  draftVersion: ResumeVersion | null;
-  isEditing: boolean;
+  draftVersion: ResumeVersion | null
+  isEditing: boolean
 
   // Getters
-  getCurrentResume: () => Resume | null;
-  getCurrentVersion: () => ResumeVersion | null;
+  getCurrentResume: () => Resume | null
+  getCurrentVersion: () => ResumeVersion | null
 
   // Actions
-  createResume: (
-    title: string,
-    templateType: "classic" | "modern" | "minimal"
-  ) => string;
+  createResume: (title: string, templateType: "classic" | "modern" | "minimal") => string
   createVersion: (data: {
-    name: string;
-    memo?: string;
-    tags?: string[];
-  }) => void;
-  selectResume: (resumeId: string) => void;
-  selectVersion: (versionId: string) => void;
-  deleteResume: (resumeId: string) => void;
-  deleteVersion: (versionId: string) => void;
+    name: string
+    memo?: string
+    tags?: string[]
+  }) => void
+  selectResume: (resumeId: string) => void
+  selectVersion: (versionId: string) => void
+  deleteResume: (resumeId: string) => void
+  deleteVersion: (versionId: string) => void
 
   // 편집 및 저장 관련 액션 추가
-  startEditing: () => void;
-  saveChanges: () => void;
-  cancelEditing: () => void;
+  startEditing: () => void
+  saveChanges: () => void
+  cancelEditing: () => void
 
   // Block actions
-  addBlock: (type: BlockType) => void;
-  removeBlock: (blockId: string) => void;
-  moveBlock: (fromIndex: number, toIndex: number) => void;
-  toggleBlockVisibility: (blockId: string) => void;
-  updateBlockContent: (blockId: string, content: any) => void;
+  addBlock: (type: BlockType) => void
+  removeBlock: (blockId: string) => void
+  moveBlock: (fromIndex: number, toIndex: number) => void
+  toggleBlockVisibility: (blockId: string) => void
+  updateBlockContent: (blockId: string, content: any) => void
 
   // Template actions
-  updateTemplate: (templateType: "classic" | "modern" | "minimal") => void;
-  updateTemplateStyle: (style: Record<string, any>) => void;
+  updateTemplate: (templateType: "classic" | "modern" | "minimal") => void
+  updateTemplateStyle: (style: Record<string, any>) => void
 }
 
 // Helper function to generate default blocks for a new resume
@@ -76,8 +67,8 @@ const generateDefaultBlocks = (): ResumeBlock[] => {
         content: "",
       },
     },
-  ];
-};
+  ]
+}
 
 // Create a deep copy of an object
 const deepCopy = <T>(obj: T): T => {

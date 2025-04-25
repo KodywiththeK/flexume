@@ -45,4 +45,3 @@ export default function CertificationsBlock({ block, templateType }: Certificati
     </div>
   )
 }
-

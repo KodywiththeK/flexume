@@ -1,17 +1,19 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { Plus, Trash2 } from "lucide-react";
-import type { ProfileData, ResumeBlock } from "@/types/resume";
-import { Button, Label, Input } from "@/components/ui";
+import { useState, useEffect } from "react"
+import { useResumeStore } from "@/store/resume-store"
+import { Plus, Trash2 } from "lucide-react"
+import type { ProfileData, ResumeBlock } from "@/types/resume"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type ProfileBlockProps = {
-  block: ResumeBlock;
-};
+  block: ResumeBlock
+}
 
 export default function ProfileBlock({ block }: ProfileBlockProps) {
-  const { updateBlockContent } = useResumeStore();
+  const { updateBlockContent } = useResumeStore()
   const [profile, setProfile] = useState<ProfileData>(
     block.content || {
       name: "",
@@ -21,47 +23,43 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
       birth: "",
       address: "",
       image: "",
-    }
-  );
+    },
+  )
 
   useEffect(() => {
     if (block.content) {
-      setProfile(block.content);
+      setProfile(block.content)
     }
-  }, [block.content]);
+  }, [block.content])
 
   const handleChange = (field: keyof ProfileData, value: string) => {
-    const updatedProfile = { ...profile, [field]: value };
-    setProfile(updatedProfile);
-    updateBlockContent(block.id, updatedProfile);
-  };
+    const updatedProfile = { ...profile, [field]: value }
+    setProfile(updatedProfile)
+    updateBlockContent(block.id, updatedProfile)
+  }
 
-  const handleLinkChange = (
-    index: number,
-    field: "label" | "url",
-    value: string
-  ) => {
-    const updatedLinks = [...profile.links];
-    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
+  const handleLinkChange = (index: number, field: "label" | "url", value: string) => {
+    const updatedLinks = [...profile.links]
+    updatedLinks[index] = { ...updatedLinks[index], [field]: value }
 
-    const updatedProfile = { ...profile, links: updatedLinks };
-    setProfile(updatedProfile);
-    updateBlockContent(block.id, updatedProfile);
-  };
+    const updatedProfile = { ...profile, links: updatedLinks }
+    setProfile(updatedProfile)
+    updateBlockContent(block.id, updatedProfile)
+  }
 
   const addLink = () => {
-    const updatedLinks = [...profile.links, { label: "", url: "" }];
-    const updatedProfile = { ...profile, links: updatedLinks };
-    setProfile(updatedProfile);
-    updateBlockContent(block.id, updatedProfile);
-  };
+    const updatedLinks = [...profile.links, { label: "", url: "" }]
+    const updatedProfile = { ...profile, links: updatedLinks }
+    setProfile(updatedProfile)
+    updateBlockContent(block.id, updatedProfile)
+  }
 
   const removeLink = (index: number) => {
-    const updatedLinks = profile.links.filter((_, i) => i !== index);
-    const updatedProfile = { ...profile, links: updatedLinks };
-    setProfile(updatedProfile);
-    updateBlockContent(block.id, updatedProfile);
-  };
+    const updatedLinks = profile.links.filter((_, i) => i !== index)
+    const updatedProfile = { ...profile, links: updatedLinks }
+    setProfile(updatedProfile)
+    updateBlockContent(block.id, updatedProfile)
+  }
 
   return (
     <div className="space-y-8">
@@ -100,12 +98,7 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="birth">생년월일</Label>
-          <Input
-            id="birth"
-            type="date"
-            value={profile.birth}
-            onChange={(e) => handleChange("birth", e.target.value)}
-          />
+          <Input id="birth" type="date" value={profile.birth} onChange={(e) => handleChange("birth", e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="address">주소</Label>
@@ -123,11 +116,7 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
         <div className="flex items-center gap-4">
           {profile.image && (
             <div className="relative w-32 h-32">
-              <img
-                src={profile.image}
-                alt="프로필 이미지"
-                className="w-full h-full object-cover rounded-lg"
-              />
+              <img src={profile.image} alt="프로필 이미지" className="w-full h-full object-cover rounded-lg" />
               <Button
                 type="button"
                 variant="ghost"
@@ -144,13 +133,13 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
               type="file"
               accept="image/*"
               onChange={(e) => {
-                const file = e.target.files?.[0];
+                const file = e.target.files?.[0]
                 if (file) {
-                  const reader = new FileReader();
+                  const reader = new FileReader()
                   reader.onloadend = () => {
-                    handleChange("image", reader.result as string);
-                  };
-                  reader.readAsDataURL(file);
+                    handleChange("image", reader.result as string)
+                  }
+                  reader.readAsDataURL(file)
                 }
               }}
               className="cursor-pointer"
@@ -162,13 +151,7 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>링크</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addLink}
-            className="h-8"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={addLink} className="h-8">
             <Plus size={16} className="mr-1" />
             링크 추가
           </Button>
@@ -179,9 +162,7 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
             <div className="grid grid-cols-2 gap-2 flex-1">
               <Input
                 value={link.label}
-                onChange={(e) =>
-                  handleLinkChange(index, "label", e.target.value)
-                }
+                onChange={(e) => handleLinkChange(index, "label", e.target.value)}
                 placeholder="GitHub"
               />
               <Input
@@ -204,5 +185,5 @@ export default function ProfileBlock({ block }: ProfileBlockProps) {
         ))}
       </div>
     </div>
-  );
+  )
 }

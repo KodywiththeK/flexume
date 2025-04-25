@@ -37,4 +37,3 @@ export default function EtcBlock({ block, templateType }: EtcBlockProps) {
     </div>
   )
 }
-

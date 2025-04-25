@@ -1,32 +1,26 @@
-"use client";
+"use client"
 
-import { useResumeStore } from "@/store/resume-store";
-import { Plus, Save, X, Eye, Download } from "lucide-react";
-import CreateResumeDialog from "./CreateResumeDialog";
-import ResumeSelector from "./ResumeSelector";
-import { useSearchParams } from "next/navigation";
-import { Badge, Button } from "@/components/ui";
+import { useResumeStore } from "@/store/resume-store"
+import { Plus, Save, X, Eye, Download } from "lucide-react"
+import CreateResumeDialog from "./CreateResumeDialog"
+import ResumeSelector from "./ResumeSelector"
+import { useSearchParams } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 export default function ResumeEditorHeader({
   onShowPreview,
   onDownloadPDF,
 }: {
-  onShowPreview: () => void;
-  onDownloadPDF: () => void;
+  onShowPreview: () => void
+  onDownloadPDF: () => void
 }) {
   // store에서 필요한 데이터 직접 사용
-  const {
-    resumes,
-    getCurrentResume,
-    getCurrentVersion,
-    isEditing,
-    startEditing,
-    cancelEditing,
-    saveChanges,
-  } = useResumeStore();
-  const currentResume = getCurrentResume();
-  const currentVersion = getCurrentVersion();
-  const isTabEdit = useSearchParams().get("tab") === "edit";
+  const { resumes, getCurrentResume, getCurrentVersion, isEditing, startEditing, cancelEditing, saveChanges } =
+    useResumeStore()
+  const currentResume = getCurrentResume()
+  const currentVersion = getCurrentVersion()
+  const isTabEdit = useSearchParams().get("tab") === "edit"
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -60,28 +54,17 @@ export default function ResumeEditorHeader({
             <>
               {isEditing ? (
                 <>
-                  <Button
-                    variant="outline"
-                    onClick={cancelEditing}
-                    className="flex items-center gap-2"
-                  >
+                  <Button variant="outline" onClick={cancelEditing} className="flex items-center gap-2">
                     <X size={16} />
                     취소
                   </Button>
-                  <Button
-                    onClick={saveChanges}
-                    className="flex items-center gap-2"
-                  >
+                  <Button onClick={saveChanges} className="flex items-center gap-2">
                     <Save size={16} />
                     저장
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="outline"
-                  onClick={startEditing}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" onClick={startEditing} className="flex items-center gap-2">
                   편집
                 </Button>
               )}
@@ -108,5 +91,5 @@ export default function ResumeEditorHeader({
         </div>
       )}
     </header>
-  );
+  )
 }

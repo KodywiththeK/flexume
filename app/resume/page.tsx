@@ -1,6 +1,5 @@
-import ResumeEditor from "@/components/resume-editor";
-import React from "react";
+import { redirect } from "next/navigation"
 
-export default function EditorPage() {
-  return <ResumeEditor />;
+export default function ResumePage() {
+  redirect("/resume/create")
 }

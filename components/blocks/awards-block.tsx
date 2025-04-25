@@ -1,36 +1,33 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { Plus, Trash2 } from "lucide-react";
-import type { ResumeBlock } from "@/types/resume";
-import {
-  Card,
-  CardContent,
-  Button,
-  Label,
-  Input,
-  Textarea,
-} from "@/components/ui";
+import { useState, useEffect } from "react"
+import { useResumeStore } from "@/store/resume-store"
+import { Plus, Trash2 } from "lucide-react"
+import type { ResumeBlock } from "@/types/resume"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
 
 type AwardItem = {
-  id: string;
-  title: string;
-  issuer: string;
-  date: string;
-  description: string;
-};
+  id: string
+  title: string
+  issuer: string
+  date: string
+  description: string
+}
 
 type AwardsData = {
-  items: AwardItem[];
-};
+  items: AwardItem[]
+}
 
 type AwardsBlockProps = {
-  block: ResumeBlock;
-};
+  block: ResumeBlock
+}
 
 export default function AwardsBlock({ block }: AwardsBlockProps) {
-  const { updateBlockContent } = useResumeStore();
+  const { updateBlockContent } = useResumeStore()
   const [awards, setAwards] = useState<AwardsData>(
     block.content || {
       items: [
@@ -42,28 +39,24 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
           description: "",
         },
       ],
-    }
-  );
+    },
+  )
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setAwards(block.content);
+      setAwards(block.content)
     }
-  }, [block.content]);
+  }, [block.content])
 
-  const handleItemChange = (
-    index: number,
-    field: keyof AwardItem,
-    value: string
-  ) => {
-    const updatedItems = [...awards.items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
+  const handleItemChange = (index: number, field: keyof AwardItem, value: string) => {
+    const updatedItems = [...awards.items]
+    updatedItems[index] = { ...updatedItems[index], [field]: value }
 
-    const updatedAwards = { ...awards, items: updatedItems };
-    setAwards(updatedAwards);
-    updateBlockContent(block.id, updatedAwards);
-  };
+    const updatedAwards = { ...awards, items: updatedItems }
+    setAwards(updatedAwards)
+    updateBlockContent(block.id, updatedAwards)
+  }
 
   const addAwardItem = () => {
     const updatedItems = [
@@ -75,19 +68,19 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
         date: "",
         description: "",
       },
-    ];
+    ]
 
-    const updatedAwards = { ...awards, items: updatedItems };
-    setAwards(updatedAwards);
-    updateBlockContent(block.id, updatedAwards);
-  };
+    const updatedAwards = { ...awards, items: updatedItems }
+    setAwards(updatedAwards)
+    updateBlockContent(block.id, updatedAwards)
+  }
 
   const removeAwardItem = (index: number) => {
-    const updatedItems = awards.items.filter((_, i) => i !== index);
-    const updatedAwards = { ...awards, items: updatedItems };
-    setAwards(updatedAwards);
-    updateBlockContent(block.id, updatedAwards);
-  };
+    const updatedItems = awards.items.filter((_, i) => i !== index)
+    const updatedAwards = { ...awards, items: updatedItems }
+    setAwards(updatedAwards)
+    updateBlockContent(block.id, updatedAwards)
+  }
 
   return (
     <div className="space-y-6">
@@ -114,9 +107,7 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
                 <Input
                   id={`title-${itemIndex}`}
                   value={item.title}
-                  onChange={(e) =>
-                    handleItemChange(itemIndex, "title", e.target.value)
-                  }
+                  onChange={(e) => handleItemChange(itemIndex, "title", e.target.value)}
                   placeholder="우수 개발자상"
                 />
               </div>
@@ -127,9 +118,7 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
                   <Input
                     id={`issuer-${itemIndex}`}
                     value={item.issuer}
-                    onChange={(e) =>
-                      handleItemChange(itemIndex, "issuer", e.target.value)
-                    }
+                    onChange={(e) => handleItemChange(itemIndex, "issuer", e.target.value)}
                     placeholder="한국소프트웨어협회"
                   />
                 </div>
@@ -139,23 +128,17 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
                     id={`date-${itemIndex}`}
                     type="date"
                     value={item.date}
-                    onChange={(e) =>
-                      handleItemChange(itemIndex, "date", e.target.value)
-                    }
+                    onChange={(e) => handleItemChange(itemIndex, "date", e.target.value)}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`description-${itemIndex}`}>
-                  설명 (선택사항)
-                </Label>
+                <Label htmlFor={`description-${itemIndex}`}>설명 (선택사항)</Label>
                 <Textarea
                   id={`description-${itemIndex}`}
                   value={item.description}
-                  onChange={(e) =>
-                    handleItemChange(itemIndex, "description", e.target.value)
-                  }
+                  onChange={(e) => handleItemChange(itemIndex, "description", e.target.value)}
                   placeholder="수상 내역에 대한 추가 설명을 입력하세요."
                 />
               </div>
@@ -164,15 +147,10 @@ export default function AwardsBlock({ block }: AwardsBlockProps) {
         </Card>
       ))}
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={addAwardItem}
-        className="w-full"
-      >
+      <Button type="button" variant="outline" onClick={addAwardItem} className="w-full">
         <Plus size={16} className="mr-2" />
         수상 내역 추가
       </Button>
     </div>
-  );
+  )
 }

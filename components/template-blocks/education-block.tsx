@@ -70,4 +70,3 @@ export default function EducationBlock({ block, templateType }: EducationBlockPr
     </div>
   )
 }
-

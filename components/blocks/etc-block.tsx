@@ -1,38 +1,39 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import type { ResumeBlock } from "@/types/resume";
-import { Label, Textarea } from "@/components/ui";
+import { useState, useEffect } from "react"
+import { useResumeStore } from "@/store/resume-store"
+import type { ResumeBlock } from "@/types/resume"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 type EtcData = {
-  content: string;
-};
+  content: string
+}
 
 type EtcBlockProps = {
-  block: ResumeBlock;
-};
+  block: ResumeBlock
+}
 
 export default function EtcBlock({ block }: EtcBlockProps) {
-  const { updateBlockContent } = useResumeStore();
+  const { updateBlockContent } = useResumeStore()
   const [etc, setEtc] = useState<EtcData>(
     block.content || {
       content: "",
-    }
-  );
+    },
+  )
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setEtc(block.content);
+      setEtc(block.content)
     }
-  }, [block.content]);
+  }, [block.content])
 
   const handleChange = (value: string) => {
-    const updatedEtc = { ...etc, content: value };
-    setEtc(updatedEtc);
-    updateBlockContent(block.id, updatedEtc);
-  };
+    const updatedEtc = { ...etc, content: value }
+    setEtc(updatedEtc)
+    updateBlockContent(block.id, updatedEtc)
+  }
 
   return (
     <div className="space-y-2">
@@ -45,5 +46,5 @@ export default function EtcBlock({ block }: EtcBlockProps) {
         className="min-h-[120px]"
       />
     </div>
-  );
+  )
 }

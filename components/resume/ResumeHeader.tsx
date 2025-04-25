@@ -1,28 +1,19 @@
-"use client";
-import { Download, Eye, Save, X } from "lucide-react";
-import { useResumeStore } from "@/store/resume-store";
-import ResumeSelector from "./ResumeSelector";
-import { Badge, Button } from "@/components/ui";
+"use client"
+import { Download, Eye, Save, X } from "lucide-react"
+import { useResumeStore } from "@/store/resume-store"
+import ResumeSelector from "./ResumeSelector"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 interface ResumeHeaderProps {
-  onPreview: () => void;
-  onDownload: () => void;
+  onPreview: () => void
+  onDownload: () => void
 }
 
-export default function ResumeHeader({
-  onPreview,
-  onDownload,
-}: ResumeHeaderProps) {
-  const {
-    getCurrentResume,
-    getCurrentVersion,
-    isEditing,
-    startEditing,
-    saveChanges,
-    cancelEditing,
-  } = useResumeStore();
+export default function ResumeHeader({ onPreview, onDownload }: ResumeHeaderProps) {
+  const { getCurrentResume, getCurrentVersion, isEditing, startEditing, saveChanges, cancelEditing } = useResumeStore()
 
-  const currentResume = getCurrentResume();
-  const currentVersion = getCurrentVersion();
+  const currentResume = getCurrentResume()
+  const currentVersion = getCurrentVersion()
 
   return (
     <header className="flex items-center justify-between">
@@ -51,28 +42,17 @@ export default function ResumeHeader({
           <>
             {isEditing ? (
               <>
-                <Button
-                  variant="outline"
-                  onClick={cancelEditing}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" onClick={cancelEditing} className="flex items-center gap-2">
                   <X size={16} />
                   취소
                 </Button>
-                <Button
-                  onClick={saveChanges}
-                  className="flex items-center gap-2"
-                >
+                <Button onClick={saveChanges} className="flex items-center gap-2">
                   <Save size={16} />
                   저장
                 </Button>
               </>
             ) : (
-              <Button
-                variant="outline"
-                onClick={startEditing}
-                className="flex items-center gap-2"
-              >
+              <Button variant="outline" onClick={startEditing} className="flex items-center gap-2">
                 편집
               </Button>
             )}
@@ -88,15 +68,11 @@ export default function ResumeHeader({
           <Eye size={16} />
           미리보기
         </Button>
-        <Button
-          className="flex items-center gap-2"
-          onClick={onDownload}
-          disabled={!currentResume || !currentVersion}
-        >
+        <Button className="flex items-center gap-2" onClick={onDownload} disabled={!currentResume || !currentVersion}>
           <Download size={16} />
           PDF 다운로드
         </Button>
       </div>
     </header>
-  );
+  )
 }

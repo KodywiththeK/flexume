@@ -70,4 +70,3 @@ export default function ProjectsBlock({ block, templateType }: ProjectsBlockProp
     </div>
   )
 }
-

@@ -1,34 +1,31 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { Plus, X } from "lucide-react";
-import type { ResumeBlock } from "@/types/resume";
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  Input,
-  Label,
-} from "@/components/ui";
+import { useState, useEffect } from "react"
+import { useResumeStore } from "@/store/resume-store"
+import { Plus, X } from "lucide-react"
+import type { ResumeBlock } from "@/types/resume"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 type SkillCategory = {
-  id: string;
-  name: string;
-  skills: string[];
-};
+  id: string
+  name: string
+  skills: string[]
+}
 
 type SkillsData = {
-  categories: SkillCategory[];
-};
+  categories: SkillCategory[]
+}
 
 type SkillsBlockProps = {
-  block: ResumeBlock;
-};
+  block: ResumeBlock
+}
 
 export default function SkillsBlock({ block }: SkillsBlockProps) {
-  const { updateBlockContent } = useResumeStore();
+  const { updateBlockContent } = useResumeStore()
   const [skills, setSkills] = useState<SkillsData>(
     block.content || {
       categories: [
@@ -38,60 +35,54 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
           skills: [],
         },
       ],
-    }
-  );
-  const [newSkill, setNewSkill] = useState<{ [key: string]: string }>({});
+    },
+  )
+  const [newSkill, setNewSkill] = useState<{ [key: string]: string }>({})
 
   // Update local state when block content changes
   useEffect(() => {
     if (block.content) {
-      setSkills(block.content);
+      setSkills(block.content)
     }
-  }, [block.content]);
+  }, [block.content])
 
   const handleCategoryNameChange = (index: number, name: string) => {
-    const updatedCategories = [...skills.categories];
-    updatedCategories[index] = { ...updatedCategories[index], name };
+    const updatedCategories = [...skills.categories]
+    updatedCategories[index] = { ...updatedCategories[index], name }
 
-    const updatedSkills = { ...skills, categories: updatedCategories };
-    setSkills(updatedSkills);
-    updateBlockContent(block.id, updatedSkills);
-  };
+    const updatedSkills = { ...skills, categories: updatedCategories }
+    setSkills(updatedSkills)
+    updateBlockContent(block.id, updatedSkills)
+  }
 
   const addSkill = (categoryIndex: number) => {
-    if (!newSkill[categoryIndex] || newSkill[categoryIndex].trim() === "")
-      return;
+    if (!newSkill[categoryIndex] || newSkill[categoryIndex].trim() === "") return
 
-    const updatedCategories = [...skills.categories];
+    const updatedCategories = [...skills.categories]
     updatedCategories[categoryIndex] = {
       ...updatedCategories[categoryIndex],
-      skills: [
-        ...updatedCategories[categoryIndex].skills,
-        newSkill[categoryIndex],
-      ],
-    };
+      skills: [...updatedCategories[categoryIndex].skills, newSkill[categoryIndex]],
+    }
 
-    const updatedSkills = { ...skills, categories: updatedCategories };
-    setSkills(updatedSkills);
-    updateBlockContent(block.id, updatedSkills);
+    const updatedSkills = { ...skills, categories: updatedCategories }
+    setSkills(updatedSkills)
+    updateBlockContent(block.id, updatedSkills)
 
     // Clear the input
-    setNewSkill({ ...newSkill, [categoryIndex]: "" });
-  };
+    setNewSkill({ ...newSkill, [categoryIndex]: "" })
+  }
 
   const removeSkill = (categoryIndex: number, skillIndex: number) => {
-    const updatedCategories = [...skills.categories];
+    const updatedCategories = [...skills.categories]
     updatedCategories[categoryIndex] = {
       ...updatedCategories[categoryIndex],
-      skills: updatedCategories[categoryIndex].skills.filter(
-        (_, i) => i !== skillIndex
-      ),
-    };
+      skills: updatedCategories[categoryIndex].skills.filter((_, i) => i !== skillIndex),
+    }
 
-    const updatedSkills = { ...skills, categories: updatedCategories };
-    setSkills(updatedSkills);
-    updateBlockContent(block.id, updatedSkills);
-  };
+    const updatedSkills = { ...skills, categories: updatedCategories }
+    setSkills(updatedSkills)
+    updateBlockContent(block.id, updatedSkills)
+  }
 
   const addCategory = () => {
     const updatedCategories = [
@@ -101,19 +92,19 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
         name: "새 카테고리",
         skills: [],
       },
-    ];
+    ]
 
-    const updatedSkills = { ...skills, categories: updatedCategories };
-    setSkills(updatedSkills);
-    updateBlockContent(block.id, updatedSkills);
-  };
+    const updatedSkills = { ...skills, categories: updatedCategories }
+    setSkills(updatedSkills)
+    updateBlockContent(block.id, updatedSkills)
+  }
 
   const removeCategory = (index: number) => {
-    const updatedCategories = skills.categories.filter((_, i) => i !== index);
-    const updatedSkills = { ...skills, categories: updatedCategories };
-    setSkills(updatedSkills);
-    updateBlockContent(block.id, updatedSkills);
-  };
+    const updatedCategories = skills.categories.filter((_, i) => i !== index)
+    const updatedSkills = { ...skills, categories: updatedCategories }
+    setSkills(updatedSkills)
+    updateBlockContent(block.id, updatedSkills)
+  }
 
   return (
     <div className="space-y-6">
@@ -126,9 +117,7 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
                 <Input
                   id={`category-${categoryIndex}`}
                   value={category.name}
-                  onChange={(e) =>
-                    handleCategoryNameChange(categoryIndex, e.target.value)
-                  }
+                  onChange={(e) => handleCategoryNameChange(categoryIndex, e.target.value)}
                   placeholder="카테고리명"
                 />
               </div>
@@ -147,11 +136,7 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {category.skills.map((skill, skillIndex) => (
-                  <Badge
-                    key={skillIndex}
-                    variant="secondary"
-                    className="px-3 py-1 text-sm"
-                  >
+                  <Badge key={skillIndex} variant="secondary" className="px-3 py-1 text-sm">
                     {skill}
                     <Button
                       variant="ghost"
@@ -177,16 +162,12 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
                   placeholder="새 기술 추가"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      e.preventDefault();
-                      addSkill(categoryIndex);
+                      e.preventDefault()
+                      addSkill(categoryIndex)
                     }
                   }}
                 />
-                <Button
-                  type="button"
-                  onClick={() => addSkill(categoryIndex)}
-                  className="shrink-0"
-                >
+                <Button type="button" onClick={() => addSkill(categoryIndex)} className="shrink-0">
                   추가
                 </Button>
               </div>
@@ -195,15 +176,10 @@ export default function SkillsBlock({ block }: SkillsBlockProps) {
         </Card>
       ))}
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={addCategory}
-        className="w-full"
-      >
+      <Button type="button" variant="outline" onClick={addCategory} className="w-full">
         <Plus size={16} className="mr-2" />
         카테고리 추가
       </Button>
     </div>
-  );
+  )
 }

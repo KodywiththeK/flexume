@@ -45,4 +45,3 @@ export default function AwardsBlock({ block, templateType }: AwardsBlockProps) {
     </div>
   )
 }
-

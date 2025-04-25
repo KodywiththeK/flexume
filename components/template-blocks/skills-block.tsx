@@ -57,4 +57,3 @@ export default function SkillsBlock({ block, templateType }: SkillsBlockProps) {
     </div>
   )
 }
-
