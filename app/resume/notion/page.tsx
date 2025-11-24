@@ -137,7 +137,7 @@ export default function NotionResumePage() {
                   </Button>
                 </Link>
               )}
-              <Button asChild variant="outline" className="ml-2">
+              <Button asChild variant="outline" className="ml-2 bg-transparent">
                 <Link href="/resume/create" className="flex items-center gap-2">
                   <FileText size={16} />
                   일반 이력서 만들기

@@ -1,35 +1,21 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
-import { RotateCcw } from "lucide-react";
-import type { BlockStyle, NotionBlockType } from "@/types/notion-resume";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Card, CardContent } from "@/components/ui/card"
+import { RotateCcw } from "lucide-react"
+import type { BlockStyle, NotionBlockType } from "@/types/notion-resume"
 
 interface BlockTypeStyleEditorProps {
-  blockTypes: NotionBlockType[];
-  blockTypeStyles: Record<NotionBlockType, BlockStyle>;
-  onUpdateBlockTypeStyle: (
-    blockType: NotionBlockType,
-    style: BlockStyle
-  ) => void;
-  onResetBlockTypeStyle: (blockType: NotionBlockType) => void;
+  blockTypes: NotionBlockType[]
+  blockTypeStyles: Record<NotionBlockType, BlockStyle>
+  onUpdateBlockTypeStyle: (blockType: NotionBlockType, style: BlockStyle) => void
+  onResetBlockTypeStyle: (blockType: NotionBlockType) => void
 }
 
 export function BlockTypeStyleEditor({
@@ -38,17 +24,32 @@ export function BlockTypeStyleEditor({
   onUpdateBlockTypeStyle,
   onResetBlockTypeStyle,
 }: BlockTypeStyleEditorProps) {
-  const [activeTab, setActiveTab] = useState("typography");
-  const [expandedTypes, setExpandedTypes] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState("typography")
+
+  const usedBlockTypes = blockTypes && blockTypes.length > 0 ? blockTypes : []
+
+  console.log("[v0] usedBlockTypes:", usedBlockTypes)
 
   // 블록 타입 그룹화
   const blockTypeGroups: Record<string, NotionBlockType[]> = {
-    headings: ["heading_1", "heading_2", "heading_3"],
-    text: ["paragraph", "quote", "callout"],
-    lists: ["bulleted_list_item", "numbered_list_item", "to_do"],
-    media: ["image", "file", "pdf", "embed", "bookmark"],
-    tables: ["table", "table_row"],
-    columns: ["column_list", "column"],
+    headings: ["heading_1", "heading_2", "heading_3"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
+    text: ["paragraph", "quote", "callout"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
+    lists: ["bulleted_list_item", "numbered_list_item", "to_do"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
+    media: ["image", "file", "pdf", "embed", "bookmark"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
+    tables: ["table", "table_row"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
+    columns: ["column_list", "column"].filter((type) =>
+      usedBlockTypes.includes(type as NotionBlockType),
+    ) as NotionBlockType[],
     other: [
       "divider",
       "code",
@@ -60,8 +61,8 @@ export function BlockTypeStyleEditor({
       "toggle",
       "template",
       "unsupported",
-    ],
-  };
+    ].filter((type) => usedBlockTypes.includes(type as NotionBlockType)) as NotionBlockType[],
+  }
 
   // 블록 타입 이름 변환
   const getBlockTypeName = (blockType: NotionBlockType): string => {
@@ -94,116 +95,143 @@ export function BlockTypeStyleEditor({
       to_do: "할 일",
       toggle: "토글",
       unsupported: "지원되지 않는 블록",
-    };
-    return nameMap[blockType] || blockType;
-  };
-
-  // 아코디언 토글 핸들러
-  const toggleExpanded = (blockType: string) => {
-    if (expandedTypes.includes(blockType)) {
-      setExpandedTypes(expandedTypes.filter((type) => type !== blockType));
-    } else {
-      setExpandedTypes([...expandedTypes, blockType]);
     }
-  };
+    return nameMap[blockType] || blockType
+  }
 
   // 스타일 변경 핸들러
-  const handleStyleChange = (
-    blockType: NotionBlockType,
-    property: keyof BlockStyle,
-    value: any
-  ) => {
-    const currentStyle = blockTypeStyles[blockType] || {};
-    const updatedStyle = { ...currentStyle, [property]: value };
-    onUpdateBlockTypeStyle(blockType, updatedStyle);
-  };
+  const handleStyleChange = (blockType: NotionBlockType, property: keyof BlockStyle, value: any) => {
+    const currentStyle = blockTypeStyles[blockType] || {}
+    const updatedStyle = { ...currentStyle, [property]: value }
+    onUpdateBlockTypeStyle(blockType, updatedStyle)
+  }
+
+  const renderSizeInput = (blockType: NotionBlockType, label: string, property: keyof BlockStyle) => {
+    return (
+      <div className="grid gap-2">
+        <Label htmlFor={`${property}-${blockType}`}>{label}</Label>
+        <div className="flex gap-2">
+          <Input
+            id={`${property}-${blockType}`}
+            type="number"
+            placeholder="0"
+            value={blockTypeStyles[blockType]?.[property]?.toString().replace(/[^0-9.-]/g, "") || ""}
+            onChange={(e) => {
+              const value = e.target.value ? `${e.target.value}px` : ""
+              handleStyleChange(blockType, property, value)
+            }}
+            className="flex-1"
+          />
+          <Select defaultValue="px" disabled>
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="px">px</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <p className="text-xs text-gray-500">픽셀 단위로만 입력 가능합니다</p>
+      </div>
+    )
+  }
 
   // 블록 타입 그룹 렌더링
   const renderBlockTypeGroup = (title: string, types: NotionBlockType[]) => {
-    if (types.length === 0) return null;
+    if (types.length === 0) return null
 
     return (
       <div className="mb-6">
         <h3 className="text-lg font-medium mb-3">{title}</h3>
         <Accordion type="multiple" className="space-y-2">
           {types.map((blockType) => (
-            <AccordionItem
-              key={blockType}
-              value={blockType}
-              className="border rounded-md"
-            >
-              <AccordionTrigger className="px-4 py-2 hover:bg-gray-50">
-                {getBlockTypeName(blockType)}
-              </AccordionTrigger>
+            <AccordionItem key={blockType} value={blockType} className="border rounded-md">
+              <AccordionTrigger className="px-4 py-2 hover:bg-gray-50">{getBlockTypeName(blockType)}</AccordionTrigger>
               <AccordionContent className="px-4 py-3 border-t">
-                <Tabs
-                  value={activeTab}
-                  onValueChange={setActiveTab}
-                  className="w-full"
-                >
-                  <TabsList className="grid grid-cols-3 mb-4">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid grid-cols-2 mb-4">
                     <TabsTrigger value="typography">타이포그래피</TabsTrigger>
-                    <TabsTrigger value="spacing">여백</TabsTrigger>
                     <TabsTrigger value="colors">색상</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="typography" className="space-y-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor={`fontSize-${blockType}`}>글자 크기</Label>
-                      <Select
-                        value={blockTypeStyles[blockType]?.fontSize || "base"}
-                        onValueChange={(value) =>
-                          handleStyleChange(blockType, "fontSize", value)
-                        }
-                      >
-                        <SelectTrigger id={`fontSize-${blockType}`}>
-                          <SelectValue placeholder="글자 크기 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="xs">아주 작게</SelectItem>
-                          <SelectItem value="sm">작게</SelectItem>
-                          <SelectItem value="base">기본</SelectItem>
-                          <SelectItem value="lg">크게</SelectItem>
-                          <SelectItem value="xl">더 크게</SelectItem>
-                          <SelectItem value="2xl">매우 크게</SelectItem>
-                          <SelectItem value="3xl">특대</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {renderSizeInput(blockType, "글자 크기 (px)", "fontSize")}
 
                     <div className="grid gap-2">
-                      <Label htmlFor={`fontWeight-${blockType}`}>
-                        글자 굵기
-                      </Label>
+                      <Label htmlFor={`fontWeight-${blockType}`}>글자 굵기</Label>
                       <Select
-                        value={
-                          blockTypeStyles[blockType]?.fontWeight || "normal"
-                        }
-                        onValueChange={(value) =>
-                          handleStyleChange(blockType, "fontWeight", value)
-                        }
+                        value={blockTypeStyles[blockType]?.fontWeight || "normal"}
+                        onValueChange={(value) => handleStyleChange(blockType, "fontWeight", value)}
                       >
                         <SelectTrigger id={`fontWeight-${blockType}`}>
                           <SelectValue placeholder="글자 굵기 선택" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="normal">기본</SelectItem>
-                          <SelectItem value="medium">중간</SelectItem>
-                          <SelectItem value="semibold">약간 굵게</SelectItem>
-                          <SelectItem value="bold">굵게</SelectItem>
+                          <SelectItem value="normal">기본 (400)</SelectItem>
+                          <SelectItem value="500">중간 (500)</SelectItem>
+                          <SelectItem value="600">약간 굵게 (600)</SelectItem>
+                          <SelectItem value="bold">굵게 (700)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="grid gap-2">
-                      <Label htmlFor={`textAlign-${blockType}`}>
-                        텍스트 정렬
-                      </Label>
+                      <Label htmlFor={`lineHeight-${blockType}`}>줄 높이 (px)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id={`lineHeight-${blockType}`}
+                          type="number"
+                          placeholder="0"
+                          value={blockTypeStyles[blockType]?.lineHeight?.toString().replace(/[^0-9.-]/g, "") || ""}
+                          onChange={(e) => {
+                            const value = e.target.value ? `${e.target.value}px` : ""
+                            handleStyleChange(blockType, "lineHeight", value)
+                          }}
+                          className="flex-1"
+                        />
+                        <Select defaultValue="px" disabled>
+                          <SelectTrigger className="w-20">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="px">px</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <p className="text-xs text-gray-500">픽셀 단위로만 입력 가능합니다</p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor={`letterSpacing-${blockType}`}>글자 간격 (px)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id={`letterSpacing-${blockType}`}
+                          type="number"
+                          placeholder="0"
+                          value={blockTypeStyles[blockType]?.letterSpacing?.toString().replace(/[^0-9.-]/g, "") || ""}
+                          onChange={(e) => {
+                            const value = e.target.value ? `${e.target.value}px` : ""
+                            handleStyleChange(blockType, "letterSpacing", value)
+                          }}
+                          className="flex-1"
+                        />
+                        <Select defaultValue="px" disabled>
+                          <SelectTrigger className="w-20">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="px">px</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <p className="text-xs text-gray-500">픽셀 단위로만 입력 가능합니다</p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor={`textAlign-${blockType}`}>텍스트 정렬</Label>
                       <Select
                         value={blockTypeStyles[blockType]?.textAlign || "left"}
-                        onValueChange={(value) =>
-                          handleStyleChange(blockType, "textAlign", value)
-                        }
+                        onValueChange={(value) => handleStyleChange(blockType, "textAlign", value)}
                       >
                         <SelectTrigger id={`textAlign-${blockType}`}>
                           <SelectValue placeholder="정렬 방식 선택" />
@@ -218,48 +246,6 @@ export function BlockTypeStyleEditor({
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="spacing" className="space-y-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor={`margin-${blockType}`}>바깥 여백</Label>
-                      <Select
-                        value={blockTypeStyles[blockType]?.margin || "md"}
-                        onValueChange={(value) =>
-                          handleStyleChange(blockType, "margin", value)
-                        }
-                      >
-                        <SelectTrigger id={`margin-${blockType}`}>
-                          <SelectValue placeholder="여백 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">없음</SelectItem>
-                          <SelectItem value="sm">작게</SelectItem>
-                          <SelectItem value="md">중간</SelectItem>
-                          <SelectItem value="lg">크게</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor={`padding-${blockType}`}>안쪽 여백</Label>
-                      <Select
-                        value={blockTypeStyles[blockType]?.padding || "md"}
-                        onValueChange={(value) =>
-                          handleStyleChange(blockType, "padding", value)
-                        }
-                      >
-                        <SelectTrigger id={`padding-${blockType}`}>
-                          <SelectValue placeholder="여백 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">없음</SelectItem>
-                          <SelectItem value="sm">작게</SelectItem>
-                          <SelectItem value="md">중간</SelectItem>
-                          <SelectItem value="lg">크게</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </TabsContent>
-
                   <TabsContent value="colors" className="space-y-4">
                     <div className="grid gap-2">
                       <Label htmlFor={`color-${blockType}`}>글자 색상</Label>
@@ -268,65 +254,35 @@ export function BlockTypeStyleEditor({
                           id={`color-${blockType}`}
                           type="color"
                           value={blockTypeStyles[blockType]?.color || "#000000"}
-                          className="w-12 h-10 p-1"
-                          onChange={(e) =>
-                            handleStyleChange(
-                              blockType,
-                              "color",
-                              e.target.value
-                            )
-                          }
+                          className="w-12 h-10 p-1 cursor-pointer"
+                          onChange={(e) => handleStyleChange(blockType, "color", e.target.value)}
                         />
                         <Input
                           type="text"
                           value={blockTypeStyles[blockType]?.color || "#000000"}
-                          className="flex-1"
-                          onChange={(e) =>
-                            handleStyleChange(
-                              blockType,
-                              "color",
-                              e.target.value
-                            )
-                          }
+                          className="flex-1 font-mono text-sm"
+                          onChange={(e) => handleStyleChange(blockType, "color", e.target.value)}
+                          placeholder="#000000"
                         />
                       </div>
                     </div>
 
                     <div className="grid gap-2">
-                      <Label htmlFor={`backgroundColor-${blockType}`}>
-                        배경 색상
-                      </Label>
+                      <Label htmlFor={`backgroundColor-${blockType}`}>배경 색상</Label>
                       <div className="flex gap-2">
                         <Input
                           id={`backgroundColor-${blockType}`}
                           type="color"
-                          value={
-                            blockTypeStyles[blockType]?.backgroundColor ||
-                            "#ffffff"
-                          }
-                          className="w-12 h-10 p-1"
-                          onChange={(e) =>
-                            handleStyleChange(
-                              blockType,
-                              "backgroundColor",
-                              e.target.value
-                            )
-                          }
+                          value={blockTypeStyles[blockType]?.backgroundColor || "#ffffff"}
+                          className="w-12 h-10 p-1 cursor-pointer"
+                          onChange={(e) => handleStyleChange(blockType, "backgroundColor", e.target.value)}
                         />
                         <Input
                           type="text"
-                          value={
-                            blockTypeStyles[blockType]?.backgroundColor ||
-                            "#ffffff"
-                          }
-                          className="flex-1"
-                          onChange={(e) =>
-                            handleStyleChange(
-                              blockType,
-                              "backgroundColor",
-                              e.target.value
-                            )
-                          }
+                          value={blockTypeStyles[blockType]?.backgroundColor || "#ffffff"}
+                          className="flex-1 font-mono text-sm"
+                          onChange={(e) => handleStyleChange(blockType, "backgroundColor", e.target.value)}
+                          placeholder="#ffffff"
                         />
                       </div>
                     </div>
@@ -349,16 +305,27 @@ export function BlockTypeStyleEditor({
           ))}
         </Accordion>
       </div>
-    );
-  };
+    )
+  }
+
+  // 사용되는 블록이 없으면 메시지 표시
+  if (usedBlockTypes.length === 0) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-sm text-gray-500">현재 이력서에 사용되는 블록이 없습니다.</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card>
       <CardContent className="pt-6">
         <h2 className="text-xl font-bold mb-4">블록 타입별 스타일 설정</h2>
         <p className="text-sm text-gray-500 mb-6">
-          각 블록 타입별로 공통 스타일을 설정하면 해당 타입의 모든 블록에 일괄
-          적용됩니다.
+          현재 이력서에서 사용 중인 블록 타입만 표시됩니다. 각 블록 타입별로 공통 스타일을 설정하면 해당 타입의 모든
+          블록에 일괄 적용됩니다.
         </p>
 
         {renderBlockTypeGroup("제목", blockTypeGroups.headings)}
@@ -370,5 +337,5 @@ export function BlockTypeStyleEditor({
         {renderBlockTypeGroup("기타", blockTypeGroups.other)}
       </CardContent>
     </Card>
-  );
+  )
 }

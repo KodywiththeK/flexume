@@ -1,17 +1,22 @@
 "use client";
 
 import type React from "react";
-
-import { useContext, useState } from "react";
-import type { StyledResumeBlock } from "@/types/notion-resume";
-import { StyleCustomizer } from "./style-customizer";
+import { useContext, useEffect, useRef, useState } from "react";
+import type { BlockStyle, StyledResumeBlock } from "@/types/notion-resume";
+import { BlockStyleEditor } from "./block-style-editor";
 import { cn } from "@/lib/utils";
-import { FileText, ExternalLink, AlertTriangle } from "lucide-react";
+import { FileText, ExternalLink, AlertTriangle, Edit2 } from "lucide-react";
 import { SelectedBlockContext } from "./selected-block-context";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 interface NotionBlockRendererProps {
   block: StyledResumeBlock;
-  onStyleChange?: (blockId: string, style: any) => void;
+  onStyleChange?: (blockId: string, styleDelta: BlockStyle) => void;
   isEditing?: boolean;
   nestingLevel?: number;
 }
@@ -26,130 +31,57 @@ export function NotionBlockRenderer({
     useContext(SelectedBlockContext);
   const isSelected = selectedBlockId === block.id;
   const [isHovering, setIsHovering] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const prevSelectedRef = useRef(false);
 
-  // 스타일 객체를 CSS 스타일로 변환
-  const getStyleObject = () => {
-    const { style } = block;
-    const styleObj: any = {};
+  /**
+   * ✅ 개선 1) 스타일 객체 단순화
+   * - A버전 편집기에서 px / 숫자 문자열 그대로 저장하므로
+   * - 여기서 불필요한 후처리/매핑 없이 그대로 CSS로 적용
+   */
+  const getStyleObject = (): React.CSSProperties => {
+    const s = block.style;
+    const styleObj: React.CSSProperties = {};
 
-    // 폰트 크기
-    if (style.fontSize) {
-      const fontSizeMap: Record<string, string> = {
-        xs: "0.75rem",
-        sm: "0.875rem",
-        base: "1rem",
-        lg: "1.125rem",
-        xl: "1.25rem",
-        "2xl": "1.5rem",
-        "3xl": "1.875rem",
-      };
-      styleObj.fontSize = fontSizeMap[style.fontSize] || "1rem";
-    }
-
-    // 폰트 굵기
-    if (style.fontWeight) {
-      const fontWeightMap: Record<string, string> = {
-        normal: "400",
-        medium: "500",
-        semibold: "600",
-        bold: "700",
-      };
-      styleObj.fontWeight = fontWeightMap[style.fontWeight] || "400";
-    }
-
-    // 텍스트 정렬
-    if (style.textAlign) {
-      styleObj.textAlign = style.textAlign;
-    }
-
-    // 색상
-    if (style.color) {
-      styleObj.color = style.color;
-    }
-
-    // 배경색
-    if (style.backgroundColor) {
-      styleObj.backgroundColor = style.backgroundColor;
-    }
-
-    // 여백
-    if (style.margin) {
-      const marginMap: Record<string, string> = {
-        none: "0",
-        sm: "0.5rem",
-        md: "1rem",
-        lg: "1.5rem",
-      };
-      styleObj.margin = marginMap[style.margin] || "1rem";
-    }
-
-    // 패딩
-    if (style.padding) {
-      const paddingMap: Record<string, string> = {
-        none: "0",
-        sm: "0.5rem",
-        md: "1rem",
-        lg: "1.5rem",
-      };
-      styleObj.padding = paddingMap[style.padding] || "1rem";
-    }
-
-    // 테두리 반경
-    if (style.borderRadius) {
-      const borderRadiusMap: Record<string, string> = {
-        none: "0",
-        sm: "0.25rem",
-        md: "0.5rem",
-        lg: "1rem",
-      };
-      styleObj.borderRadius = borderRadiusMap[style.borderRadius] || "0";
-    }
-
-    // 테두리 색상
-    if (style.borderColor) {
-      styleObj.borderColor = style.borderColor;
-    }
-
-    // 테두리 두께
-    if (style.borderWidth) {
-      const borderWidthMap: Record<string, string> = {
-        none: "0",
-        thin: "1px",
-        medium: "2px",
-        thick: "4px",
-      };
-      styleObj.borderWidth = borderWidthMap[style.borderWidth] || "0";
-    }
-
-    // 테두리 스타일
-    if (style.borderStyle) {
-      styleObj.borderStyle = style.borderStyle;
-    }
-
-    // 너비
-    if (style.width) {
-      styleObj.width = style.width;
-    }
-
-    // 최대 너비
-    if (style.maxWidth) {
-      styleObj.maxWidth = style.maxWidth;
-    }
+    if (s.fontSize) styleObj.fontSize = s.fontSize as any;
+    if (s.fontWeight) styleObj.fontWeight = s.fontWeight as any;
+    if (s.lineHeight) styleObj.lineHeight = s.lineHeight as any;
+    if (s.letterSpacing) styleObj.letterSpacing = s.letterSpacing as any;
+    if (s.textAlign) styleObj.textAlign = s.textAlign;
+    if (s.color) styleObj.color = s.color;
+    if (s.backgroundColor) styleObj.backgroundColor = s.backgroundColor;
+    if (s.width) styleObj.width = s.width;
+    if (s.maxWidth) styleObj.maxWidth = s.maxWidth;
+    if (typeof s.flexGrow === "number") styleObj.flexGrow = s.flexGrow;
+    if (s.gridTemplateColumns)
+      styleObj.gridTemplateColumns = s.gridTemplateColumns;
 
     return styleObj;
   };
 
-  // 블록 클릭 핸들러
-  const handleBlockClick = (e: React.MouseEvent) => {
-    if (isEditing && onStyleChange) {
-      // 이벤트 버블링 방지
-      e.stopPropagation();
+  /**
+   * ✅ 개선 2) 선택하면 Popover 자동 오픈 (단, 사용자가 닫으면 유지)
+   * - "선택됨으로 전환" 순간에만 자동 open
+   * - 선택 해제되면 강제 close
+   */
+  useEffect(() => {
+    if (isSelected && !prevSelectedRef.current) {
+      setIsPopoverOpen(true);
+    }
+    if (!isSelected) {
+      setIsPopoverOpen(false);
+    }
+    prevSelectedRef.current = isSelected;
+  }, [isSelected]);
 
-      if (isSelected) {
-        setSelectedBlockId(null); // Close if already selected
-      } else {
-        setSelectedBlockId(block.id); // Open this block's customizer
-      }
+  const handleBlockClick = (e: React.MouseEvent) => {
+    if (!isEditing || !onStyleChange) return;
+    e.stopPropagation();
+
+    if (isSelected) {
+      setSelectedBlockId(null);
+    } else {
+      setSelectedBlockId(block.id);
     }
   };
 
@@ -442,14 +374,11 @@ export function NotionBlockRenderer({
     );
   };
 
-  // renderColumnList 함수를 더 정확하게 수정
   const renderColumnList = () => {
-    // gridTemplateColumns 스타일이 있으면 사용, 없으면 자식 컬럼의 width 속성으로 구성
     const gridTemplateColumns =
       block.style.gridTemplateColumns ||
       block.children
         ?.map((child) => {
-          // width가 fr 단위로 지정되어 있으면 그대로 사용
           if (
             child.style.width &&
             typeof child.style.width === "string" &&
@@ -457,7 +386,6 @@ export function NotionBlockRenderer({
           ) {
             return child.style.width;
           }
-          // 그 외의 경우 기본값 1fr 사용
           return "1fr";
         })
         .join(" ") ||
@@ -483,23 +411,17 @@ export function NotionBlockRenderer({
   };
 
   const renderColumn = () => {
-    // 컬럼 너비 정보 추출
     const columnRatio = getColumnRatio();
-
-    // 컬럼 스타일 설정
     let columnStyle: React.CSSProperties = { flex: 1 };
 
     if (columnRatio) {
-      // 비율이 0과 1 사이의 값이면 flex-basis와 함께 사용
       if (columnRatio > 0 && columnRatio <= 1) {
         columnStyle = {
           flexGrow: columnRatio,
           flexBasis: 0,
           minWidth: `${columnRatio * 100}%`,
         };
-      }
-      // 비율이 1보다 크면 직접적인 너비 값으로 간주
-      else if (columnRatio > 1) {
+      } else if (columnRatio > 1) {
         columnStyle = {
           width: `${columnRatio}px`,
           flexShrink: 0,
@@ -514,18 +436,11 @@ export function NotionBlockRenderer({
     );
   };
 
-  // 컬럼 너비 비율 추출 함수
   const getColumnRatio = (): number | null => {
-    // Notion API에서 제공하는 컬럼 너비 정보 추출
     if (block.type === "column" && block.content) {
-      // 너비 정보가 ratio 속성으로 제공되는 경우
-      if (block.content.ratio) {
-        return Number.parseFloat(block.content.ratio);
-      }
+      if (block.content.ratio) return Number.parseFloat(block.content.ratio);
 
-      // 너비 정보가 width 속성으로 제공되는 경우 (백분율로 제공됨)
       if (block.content.width) {
-        // width가 문자열이고 백분율로 표시된 경우 (예: "50%")
         if (
           typeof block.content.width === "string" &&
           block.content.width.endsWith("%")
@@ -535,14 +450,10 @@ export function NotionBlockRenderer({
         return Number.parseFloat(block.content.width);
       }
 
-      // 원본 Notion 블록 데이터에서 너비 정보 추출 시도
       if (block.content._rawData && block.content._rawData.format) {
         const format = block.content._rawData.format;
-        if (format.ratio) {
-          return Number.parseFloat(format.ratio);
-        }
+        if (format.ratio) return Number.parseFloat(format.ratio);
         if (format.width) {
-          // width가 문자열이고 백분율로 표시된 경우 (예: "50%")
           if (typeof format.width === "string" && format.width.endsWith("%")) {
             return Number.parseFloat(format.width) / 100;
           }
@@ -553,7 +464,7 @@ export function NotionBlockRenderer({
     return null;
   };
 
-  const renderTable = (content: any) => {
+  const renderTable = (_content: any) => {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-200">
@@ -658,7 +569,7 @@ export function NotionBlockRenderer({
     );
   };
 
-  const renderLinkToPage = (content: any) => {
+  const renderLinkToPage = (_content: any) => {
     return (
       <div className="text-blue-600">
         <span>→ 페이지 링크 (PDF에서는 작동하지 않음)</span>
@@ -692,13 +603,13 @@ export function NotionBlockRenderer({
     );
   };
 
-  const renderSyncedBlock = (content: any) => {
+  const renderSyncedBlock = (_content: any) => {
     return (
       <div className="border-l-2 border-blue-300 pl-4">{renderChildren()}</div>
     );
   };
 
-  const renderTableOfContents = (content: any) => {
+  const renderTableOfContents = (_content: any) => {
     return (
       <div className="border rounded p-4 bg-gray-50">
         <div className="text-sm text-gray-500">
@@ -765,7 +676,6 @@ export function NotionBlockRenderer({
     );
   };
 
-  // 리치 텍스트 스타일 적용
   const getRichTextStyle = (text: any) => {
     const style: any = {};
 
@@ -788,47 +698,14 @@ export function NotionBlockRenderer({
     return style;
   };
 
-  // 자식 블록 렌더링
+  /**
+   * ✅ 개선 3) renderChildren() 정리
+   * - column_list / column 분기 제거 (죽은 코드)
+   * - 일반 중첩만 담당
+   */
   const renderChildren = () => {
-    if (!block.children || block.children.length === 0) {
-      return null;
-    }
+    if (!block.children?.length) return null;
 
-    // 특별한 중첩 처리가 필요한 블록 타입에 따라 다르게 렌더링
-    if (block.type === "column_list") {
-      return (
-        <div
-          className="flex flex-col md:flex-row gap-4 w-full"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {block.children.map((child) => (
-            <NotionBlockRenderer
-              key={child.id}
-              block={child}
-              onStyleChange={onStyleChange}
-              isEditing={isEditing}
-              nestingLevel={nestingLevel + 1}
-            />
-          ))}
-        </div>
-      );
-    } else if (block.type === "column") {
-      return (
-        <div onClick={(e) => e.stopPropagation()}>
-          {block.children.map((child) => (
-            <NotionBlockRenderer
-              key={child.id}
-              block={child}
-              onStyleChange={onStyleChange}
-              isEditing={isEditing}
-              nestingLevel={nestingLevel + 1}
-            />
-          ))}
-        </div>
-      );
-    }
-
-    // 일반적인 중첩 처리
     return (
       <div
         className={nestingLevel > 0 ? "" : "pl-4 border-l border-gray-200"}
@@ -847,7 +724,6 @@ export function NotionBlockRenderer({
     );
   };
 
-  // 블록 타입 이름 가져오기
   const getBlockTypeName = (type: string): string => {
     const nameMap: Record<string, string> = {
       paragraph: "문단",
@@ -863,13 +739,16 @@ export function NotionBlockRenderer({
       column: "열",
       column_list: "열 목록",
       table: "테이블",
-      // Add more mappings as needed
     };
     return nameMap[type] || type;
   };
 
   return (
-    <div className="notion-block mb-4 relative">
+    <div
+      data-resume-block
+      data-block-id={block.id}
+      className="notion-block mb-4 relative"
+    >
       <div
         className={cn(
           "notion-block-content relative",
@@ -902,7 +781,7 @@ export function NotionBlockRenderer({
                   : "bg-gray-200 border-gray-300",
                 isHovering && !isSelected && "bg-gray-300 border-gray-400"
               )}
-            ></div>
+            />
           </div>
         )}
 
@@ -912,18 +791,36 @@ export function NotionBlockRenderer({
             {getBlockTypeName(block.type)}
           </div>
         )}
+
         {renderBlockContent()}
       </div>
 
+      {/* ✅ Popover 유지 + 선택 시 자동 오픈 */}
       {isSelected && isEditing && onStyleChange && (
-        <StyleCustomizer
-          block={block}
-          onStyleChange={onStyleChange}
-          onClose={() => setSelectedBlockId(null)}
-        />
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="default"
+              className={cn(
+                "absolute bottom-0 right-0 z-10",
+                isHovering || isPopoverOpen ? "opacity-100" : "opacity-0",
+                "transition-opacity duration-200"
+              )}
+            >
+              <Edit2 size={16} className="mr-2" />
+              Edit Style
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0">
+            <BlockStyleEditor
+              block={block}
+              onStyleChange={onStyleChange}
+              onClose={() => setSelectedBlockId(null)}
+            />
+          </PopoverContent>
+        </Popover>
       )}
 
-      {/* Special nested blocks handling remains the same */}
       {block.type !== "column_list" &&
         block.type !== "column" &&
         renderChildren()}

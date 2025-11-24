@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FileText, LogOut, Menu, NotebookPen, X } from "lucide-react"
-import { useState } from "react"
-import { useNotionAuthStore } from "@/store/notion-auth-store"
-import { NotionLogo } from "../notion/notion-logo"
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FileText, LogOut, Menu, NotebookPen, X } from "lucide-react";
+import { useState } from "react";
+import { useNotionAuthStore } from "@/store/notion-auth-store";
+import { NotionLogo } from "../notion/notion-logo";
 
 export default function Header() {
-  const pathname = usePathname()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { isAuthenticatedWithNotion, notionUserName, logout } = useNotionAuthStore()
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticatedWithNotion, notionUserName, logout } =
+    useNotionAuthStore();
 
   // Check if we're on the landing page
-  const isLandingPage = pathname === "/"
+  const isLandingPage = pathname === "/";
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -31,13 +32,21 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-8">
           <Link
             href="/resume/create"
-            className={`text-sm font-medium ${pathname.includes("/resume/create") ? "text-lime-600" : "text-gray-600 hover:text-gray-900"}`}
+            className={`text-sm font-medium ${
+              pathname.includes("/resume/create")
+                ? "text-lime-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
           >
             이력서 만들기
           </Link>
           <Link
             href="/resume/notion"
-            className={`text-sm font-medium ${pathname.includes("/resume/notion") ? "text-lime-600" : "text-gray-600 hover:text-gray-900"}`}
+            className={`text-sm font-medium ${
+              pathname.includes("/resume/notion")
+                ? "text-lime-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
           >
             Notion 연동
           </Link>
@@ -45,8 +54,15 @@ export default function Header() {
           {isAuthenticatedWithNotion && (
             <div className="flex items-center gap-2 text-sm">
               <NotionLogo className="w-3 h-3" />
-              <span className="text-gray-600">{notionUserName || "Notion User"}</span>
-              <Button variant="ghost" size="sm" className="text-red-600 h-7 px-2" onClick={() => logout()}>
+              <span className="text-gray-600">
+                {notionUserName || "Notion User"}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-600 h-7 px-2"
+                onClick={() => logout()}
+              >
                 <LogOut size={14} />
               </Button>
             </div>
@@ -76,7 +92,11 @@ export default function Header() {
           <div className="container mx-auto px-4 flex flex-col gap-4">
             <Link
               href="/resume/create"
-              className={`flex items-center gap-2 p-2 rounded-md ${pathname.includes("/resume/create") ? "bg-lime-50 text-lime-600" : "text-gray-600"}`}
+              className={`flex items-center gap-2 p-2 rounded-md ${
+                pathname.includes("/resume/create")
+                  ? "bg-lime-50 text-lime-600"
+                  : "text-gray-600"
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <FileText size={18} />
@@ -84,7 +104,11 @@ export default function Header() {
             </Link>
             <Link
               href="/resume/notion"
-              className={`flex items-center gap-2 p-2 rounded-md ${pathname.includes("/resume/notion") ? "bg-lime-50 text-lime-600" : "text-gray-600"}`}
+              className={`flex items-center gap-2 p-2 rounded-md ${
+                pathname.includes("/resume/notion")
+                  ? "bg-lime-50 text-lime-600"
+                  : "text-gray-600"
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <NotebookPen size={18} />
@@ -95,15 +119,17 @@ export default function Header() {
               <div className="flex items-center justify-between p-2 border-t border-gray-100">
                 <div className="flex items-center gap-2">
                   <NotionLogo className="w-4 h-4" />
-                  <span className="text-gray-600">{notionUserName || "Notion User"}</span>
+                  <span className="text-gray-600">
+                    {notionUserName || "Notion User"}
+                  </span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-red-600"
                   onClick={() => {
-                    logout()
-                    setMobileMenuOpen(false)
+                    logout();
+                    setMobileMenuOpen(false);
                   }}
                 >
                   <LogOut size={16} className="mr-1" />
@@ -122,5 +148,5 @@ export default function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }
